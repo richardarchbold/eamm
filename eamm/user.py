@@ -1,20 +1,101 @@
-'''
-Created on 3 Jan 2013
+"""The user module provides business logic functionality to the main EAMM application.
 
-@author: richard
-'''
+This modules provides basic user management functionality. It uses the database class as
+an abstraction layer to communicate with the mysql instance.
 
-#!/usr/bin/env python
+  Class:
+      User: The main class this module provides.
+      
+Source: https://github.com/richardarchbold/eamm
+Created: 3 Jan 2013
+"""
+
+__authors__ = [
+  # alphabetical order by last name, please
+  '"Richard  Archbold" <richardarchbold@gmail.com>',
+]
+
+import eamm.database
+import logging
+
+# setup basic logging config
+logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
 
 class User(object):
+
+    """This class provides business logic for adding/updating/viewing eamm application users.
+
+    Public Attributes:
+        none.
+    Public Methods:
+        add_user:(full_name, email_addr, username, password)
+        is_already_registered(email_addr, username)
+    """
+
     def __init__(self):
+        """Constructor, sets all initial valies to NULL.
+
+        Args:
+            none.
+
+       Returns:
+            User object.
+
+        Raises:
+            none.
+        """
+
         self.full_name = ""
         self.email_addr = ""
         self.username = ""
         self.password = ""
     
     def add_user(self, full_name, email_addr, username, password):
+        """A one line summary of the function/method, eg: Fetch rows from a table.
+
+        Args:
+            Arg1: description
+            Arg2: description
+           row to fetch.
+
+        Returns:
+            A dict mapping keys to the corresponding table row data
+            fetched. Each row is represented as a tuple of strings. For
+
+        Raises:
+        IOError: An error occurred accessing the table.Table object.
+        """
+
+        sql = "insert into User (full_name, email_addr, username, password) values ('%s', '%s', '%s', '%s')" % (full_name, email_addr, username, password)
+    
+        # no need to try/catch/rasie these, as the subclass takes care of that.
+        my_db_connection = eamm.database.MyDatabase()
+        my_db_connection.insert(sql)  
         return True
     
-    def is_already_registered(self, email_add, username):
-        return False
+    # check the DB to see if an account already exists for the submitted email address or username.
+    # return false if no user exists, return true if a user exists for either the email address or username.
+    def is_already_registered(self, email_addr, username):
+        """Checks to see if an email_addr or username is already registered in the Users tables.
+
+        Args:
+            email_addr: email address of the user you're checking.
+            username: username of the user you're checking.
+
+        Returns:
+            my_query_results: a dict of tuples.
+
+        Raises:
+            none, errors raised in the subclasses.
+        """       
+
+        sql = "select count(*) from User where (email_addr = '%s' or username = '%s')" % (email_addr, username)
+        my_db_connection = eamm.database.MyDatabase()
+        my_query_results = my_db_connection.select(sql)        # my_query_results is a dict of tuples.
+        logging.info(my_query_results[0][0])
+            
+        if my_query_results[0][0] == 0:
+            return False
+        else:
+            return True 
+        

@@ -1,17 +1,20 @@
+#!/usr/bin/env python
+
 '''
 Created on 3 Jan 2013
-
 @author: richard
 '''
-
-from eamm.base_webpage import *
-from eamm.user import *
+import eamm.base_webpage 
+import eamm.user
 
 # Import modules for CGI handling 
 import cgi
 import cgitb; cgitb.enable(display=1)
 
-class AddUserWebPage(WebPage):
+import logging
+logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
+
+class AddUserWebPage(eamm.base_webpage.WebPage):
     '''
     classdocs
     '''
@@ -31,13 +34,31 @@ class AddUserWebPage(WebPage):
         
         add_user_form = """
         <p>
+        
         <form name="main" method="POST" action="/eamm/add_user.py"> 
-        Full Name: <input type="text" id="Full Name" name="Full Name"/><br>
-        Email Address: <input type="text" id="Email Addr" name="Email Addr"/><br>
-        username: <input type="text" id="username" name="username"/><br>
-        password: <input type="password" id="password" name="password"/><br>
-        <input type="submit" value="Submit" />
-        <p>
+        
+        <table width="400" border="border" align="center" bgcolor="#1E90FF">
+          <tr>
+            <td>Full Name:</td>
+            <td><input type="text" colspan="30" id="Full Name" name="Full Name"/><td>
+          </tr>
+          <tr>
+            <td>Email Address:</td>
+            <td><input type="text" colspan="30" id="Email Addr" name="Email Addr"/></td>
+          </tr>
+          <tr>
+            <td>username:</td>
+            <td><input type="text" colspan="30" id="username" name="username"/></td>
+          </tr>
+          <tr>
+            <td>password:</td> 
+            <td><input type="password" colspan="30" id="password" name="password"/></td>
+          </tr>
+          <tr>
+            <td width="100%"><input type="submit" value="Submit" /><td>
+          </tr>
+        </table>  
+        
         """
 
         self.add_to_body(add_user_form)
@@ -48,8 +69,6 @@ class AddUserWebPage(WebPage):
         this is the externally called method when the HTTP method is POST
         '''
         self.set_title("Add User :: Results")
-        
-        my_debug = True
                        
         form = cgi.FieldStorage()
         
@@ -62,27 +81,27 @@ class AddUserWebPage(WebPage):
         if form.getvalue('Email Addr'):
             password = form.getvalue('password')
         
-        if my_debug:
-            form_foo = "<p><p> full_name: " + full_name + "\n email_addr" + email_addr + "<p><p>"
-            self.add_to_body(form_foo)
+        logging.info("full_name: ", full_name, " email_addr: ", email_addr)
             
         # returns False is the account is not registered, returns the username or email_addr if either one is
         # already registered. If both registered, both returned.
-        this_user = User()
+        this_user = eamm.user.User()
         response = this_user.is_already_registered(email_addr, username)
-        if response != False:
-            user_message = "Error: " + response + " is already registered, try again"
+        if response == True:
+            user_message = "Error: is already registered, try again"
+            user_message = self.error_table(user_message)
             self.add_to_body(user_message)
             self.render()
         else:
             # returns True if successful, returns an error if unsuccessful.
-            
             response2 = this_user.add_user(full_name, email_addr, username, password)
             if response2 != True:
                 user_message = "Error: " + response2 
                 self.render()
             else:
-                user_message = "Success!"
+                user_message = "Success! %s, you account is now active" % full_name
+                user_message = self.simple_table(user_message)
+                self.add_to_body(user_message)
                 self.render()
                 
     

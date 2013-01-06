@@ -1,22 +1,26 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
-
+'''
+Created on 3 Jan 2013
+@author: richard
+'''
 
 # using this to determine GET or POST.
 import os
+import logging
+import eamm.add_user_webpage
 
-# does the heavy lifting
-from eamm.add_user_webpage import *
+# setup basic logging config
+logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
 
 def main():
 
-    this_webpage = AddUserWebPage();
+    this_webpage = eamm.add_user_webpage.AddUserWebPage();
     
     # if GET, we are displaying the form for input
     # if POST, we are reading the form, validating it, saving it to the DB and displaying a message back to the user.
     if os.environ['REQUEST_METHOD'] == 'GET':
-        this_webpage.display_add_user_form()
-                
+        this_webpage.display_add_user_form()     
     elif os.environ['REQUEST_METHOD'] == 'POST':
         this_webpage.process_add_user_form()    
         
