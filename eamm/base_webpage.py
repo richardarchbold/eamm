@@ -1,8 +1,11 @@
+"""This module provides webpage/html functionality common to all eamm webpages.
 
-'''
-Created on 3 Jan 2013
-@author: richard
-'''
+  Class:
+      WebPage: The main class this module provides.
+      
+Source: https://github.com/richardarchbold/eamm
+Created: 3 Jan 2013
+"""
 
 import logging
 
@@ -10,7 +13,16 @@ import logging
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
 
 class WebPage(object):
-    
+
+    """This class provides website/html functionality common to all eamm webpages.
+
+    Public Attributes:
+        none.
+    Public Methods:
+        display_add_user_form()
+        process_add_user_form()
+    """
+       
     def __init__(self):
         self.title = "EAMM ::"
         self.body = ""
@@ -24,6 +36,7 @@ class WebPage(object):
             <td><h1>Efficient Automated Meeting Manager :: %s</h1></td></tr>
             </table><br/><br/>
             """ % title
+            
     def simple_table(self, message):
         html = """
         <table width="400" border="border" align="center" bgcolor="#1E90FF">

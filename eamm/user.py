@@ -37,10 +37,8 @@ class User(object):
 
         Args:
             none.
-
-       Returns:
+        Returns:
             User object.
-
         Raises:
             none.
         """
@@ -52,18 +50,16 @@ class User(object):
     
     def add_user(self, full_name, email_addr, username, password):
         """A one line summary of the function/method, eg: Fetch rows from a table.
-
+       
         Args:
             Arg1: description
             Arg2: description
            row to fetch.
-
         Returns:
             A dict mapping keys to the corresponding table row data
             fetched. Each row is represented as a tuple of strings. For
-
         Raises:
-        IOError: An error occurred accessing the table.Table object.
+            IOError: An error occurred accessing the table.Table object.
         """
 
         sql = "insert into User (full_name, email_addr, username, password) values ('%s', '%s', '%s', '%s')" % (full_name, email_addr, username, password)
@@ -73,18 +69,14 @@ class User(object):
         my_db_connection.insert(sql)  
         return True
     
-    # check the DB to see if an account already exists for the submitted email address or username.
-    # return false if no user exists, return true if a user exists for either the email address or username.
     def is_already_registered(self, email_addr, username):
         """Checks to see if an email_addr or username is already registered in the Users tables.
 
         Args:
             email_addr: email address of the user you're checking.
             username: username of the user you're checking.
-
         Returns:
             my_query_results: a dict of tuples.
-
         Raises:
             none, errors raised in the subclasses.
         """       

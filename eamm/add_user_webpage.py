@@ -1,38 +1,66 @@
-#!/usr/bin/env python
+"""The module provides website/HTML functionality for user manager..
 
-'''
-Created on 3 Jan 2013
-@author: richard
-'''
+  Class:
+      AddUserWebPage: The main class this module provides, extends base_webpage.WebPage
+      
+Source: https://github.com/richardarchbold/eamm
+Created: 3 Jan 2013
+"""
+
+__authors__ = [
+  # alphabetical order by last name, please
+  '"Richard  Archbold" <richardarchbold@gmail.com>',
+]
+
 import eamm.base_webpage 
 import eamm.user
 
-# Import modules for CGI handling 
+# Import modules for CGI handling , the cgitb modules gives descriptive debug errors to the browser.
 import cgi
 import cgitb; cgitb.enable(display=1)
-
 import logging
+
+# setup basic logging config.
 logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
 
 class AddUserWebPage(eamm.base_webpage.WebPage):
-    '''
-    classdocs
-    '''
 
+    """This class provides website/html components for Adding Users to the application.
+
+    Public Attributes:
+        none.
+    Public Methods:
+        display_add_user_form()
+        process_add_user_form()
+    """
+    
     def __init__(self):
-        '''
-        Constructor
-        We use the super built-in because we need to.
-        '''
+        """Constructor, sets all initial values to NULL.
+
+        Args:
+            none.
+        Returns:
+             AddUserWebPage object.
+        Raises:
+            none.
+        """
         super(AddUserWebPage, self).__init__()
         
     def display_add_user_form(self):
-        '''
-        this is the externally called method when HTTP method is GET
-        '''
+        """This is the externally called method when HTTP method is GET
+
+        Args:
+            none.
+        Returns:
+            none (prints out the webpage)
+        Raises:
+            none, errors raised in the subclasses.
+        """       
+
         self.set_title("Add User")
         
         add_user_form = """
+        
         <p>
         
         <form name="main" method="POST" action="/eamm/add_user.py"> 
@@ -65,9 +93,16 @@ class AddUserWebPage(eamm.base_webpage.WebPage):
         self.render()
         
     def process_add_user_form(self):
-        '''
-        this is the externally called method when the HTTP method is POST
-        '''
+        """This is the externally called method when HTTP method is POST
+
+        Args:
+            none (though it pulls/uses the form contents.
+        Returns:
+            none (prints out the webpage)
+        Raises:
+            none, errors raised in the subclasses.
+        """    
+        
         self.set_title("Add User :: Results")
                        
         form = cgi.FieldStorage()
@@ -102,7 +137,4 @@ class AddUserWebPage(eamm.base_webpage.WebPage):
                 user_message = "Success! %s, you account is now active" % full_name
                 user_message = self.simple_table(user_message)
                 self.add_to_body(user_message)
-                self.render()
-                
-    
-        
+                self.render()    
