@@ -56,7 +56,7 @@ class MeetingTemplate(object):
     def get_all(self):
         
         sql = '''
-        SELECT title, description, purpose, agenda FROM EAMM.Template 
+        SELECT idMeetingTemplate, title, description, purpose, agenda FROM EAMM.Template 
             ORDER BY idMeetingTemplate;
         '''   
         

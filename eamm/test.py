@@ -30,9 +30,9 @@ def main():
             title = all_templates[count][0]
             description = all_templates[count][1]
             purpose = all_templates[count][2]
-            print("title: %s" % title)
-            print("desc: %s" % description)
-            print("purpose: %s \n\n" % purpose)
+            my_string = "test: {0}".format(title)
+            print(my_string)
+      
 
 if __name__ == '__main__':
     main()
