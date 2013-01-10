@@ -18,6 +18,10 @@ __authors__ = [
 import eamm.database
 import logging
 
+# Import modules for CGI handling , the cgitb modules gives descriptive debug errors to the browser.
+import cgi
+import cgitb; cgitb.enable(display=1)
+
 # setup basic logging config
 logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
 
@@ -58,9 +62,9 @@ class MeetingTemplate(object):
         
         my_db_connection = eamm.database.MyDatabase()
         my_query_results = my_db_connection.select(sql)        # my_query_results is a dict (tuple of tuples).
-        logging.info(my_query_results[0][0])
-            
+    
         if my_query_results[0][0] == 0:
+            # this means the select got back nothing.
             return False
         else:
             return my_query_results

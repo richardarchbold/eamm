@@ -69,7 +69,7 @@ class MyDatabase(object):
         Raises:
             none.
         """
-        logging.info("SELECT: ", select_stmt)
+        logging.info("SELECT: %s " % select_stmt)
         try:
             cursor = self.db.cursor()
             cursor.execute(select_stmt)
@@ -79,7 +79,7 @@ class MyDatabase(object):
         except:
             logging.info("MySQLdb.select(%s) failed" % select_stmt)
             raise
-        
+        logging.info("SELECT: returned %s rows" % len(rows))
         cursor.close()
         self.db.close()
         return rows

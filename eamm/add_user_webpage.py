@@ -63,7 +63,7 @@ class AddUserWebPage(eamm.base_webpage.WebPage):
         
         <p>
         
-        <form name="main" method="POST" action="/eamm/add_user.py"> 
+        <form name="add_user" method="POST" action="/eamm/add_user.py"> 
         
         <table width="400" border="border" align="center" bgcolor="#1E90FF">
           <tr>

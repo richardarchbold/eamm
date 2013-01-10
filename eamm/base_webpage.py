@@ -32,6 +32,7 @@ class WebPage(object):
         self.title = self.title + ' ' + title
         if not self.body:
             self.body = """
+            <table>
             <tr><td><img src="images/dilbert-meeting.jpg" width="234" height="211"/></td>
             <td><h1>Efficient Automated Meeting Manager :: %s</h1></td></tr>
             </table><br/><br/>
@@ -63,7 +64,6 @@ class WebPage(object):
         print "<title> %s </title>" % self.title
         print "</head>"
         print "<body bgcolor=\"%s\">" % self.bgcolor
-        print "<table>"
         print self.body
         print "</body>"
         print "</html>\r\n\r\n"
