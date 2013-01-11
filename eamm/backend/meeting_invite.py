@@ -15,7 +15,7 @@ __authors__ = [
   '"Richard  Archbold" <richardarchbold@gmail.com>',
 ]
 
-class MyClass(object):
+class MeetingInvite(object):
     """Summary of class here.
 
     Longer class information....

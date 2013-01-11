@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
-"""A one line summary of the module or script, terminated by a period.
+"""
+
+A one line summary of the module or script, terminated by a period.
 
 Leave one blank line. The rest of this __doc__ string should contain an
 overall description of the module or script.  Optionally, it may also
