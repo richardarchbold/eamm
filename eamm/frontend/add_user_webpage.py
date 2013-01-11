@@ -12,8 +12,8 @@ __authors__ = [
   '"Richard  Archbold" <richardarchbold@gmail.com>',
 ]
 
-import eamm.base_webpage 
-import eamm.user
+import eamm.frontend.base_webpage 
+import eamm.backend.user
 
 # Import modules for CGI handling , the cgitb modules gives descriptive debug errors to the browser.
 import cgi
@@ -23,7 +23,7 @@ import logging
 # setup basic logging config.
 logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
 
-class AddUserWebPage(eamm.base_webpage.WebPage):
+class AddUserWebPage(eamm.frontend.base_webpage.WebPage):
 
     """This class provides website/html components for Adding Users to the application.
 
@@ -120,7 +120,7 @@ class AddUserWebPage(eamm.base_webpage.WebPage):
             
         # returns False is the account is not registered, returns the username or email_addr if either one is
         # already registered. If both registered, both returned.
-        this_user = eamm.user.User()
+        this_user = eamm.backend.user.User()
         response = this_user.is_already_registered(email_addr, username)
         if response == True:
             user_message = "Error: is already registered, try again"

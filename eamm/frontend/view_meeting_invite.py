@@ -15,9 +15,9 @@ __authors__ = [
   '"Richard  Archbold" <richardarchbold@gmail.com>',
 ]
 
-import eamm.base_webpage 
-import eamm.meeting_template
-import eamm.meeting_invite
+import eamm.frontend.base_webpage 
+import eamm.backend.meeting_template
+import eamm.backend.meeting_invite
 
 # Import modules for CGI handling , the cgitb modules gives descriptive debug errors to the browser.
 import cgi
@@ -30,7 +30,7 @@ import logging
 logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
 logging.info("-----------------------")
 
-class AddMeetingWebPage(eamm.base_webpage.WebPage):
+class AddMeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
     """Summary of class here.
 
     Longer class information....
@@ -60,7 +60,7 @@ class AddMeetingWebPage(eamm.base_webpage.WebPage):
         """
         super(AddMeetingWebPage, self).__init__()
             
-    def display_add_meeting_initial_form(self):
+    def display_add_meeting_invite_initial_form(self):
         """A one line summary of the function/method, eg: Fetch rows from a table.
 
         Args:
@@ -80,7 +80,7 @@ class AddMeetingWebPage(eamm.base_webpage.WebPage):
         
         # Set up the start of the form, based on the teachings of "death by meeting", also get requester to state
         # the purpose and goal of the meeting.
-        my_initial_meeting_form = """
+        my_initial_meeting_invite_form = """
         <form name="add_meeting" method="POST" action="/eamm/add_meeting.py">  
         <input type="hidden" name="method" value="display_add_meeting_initial_form">
         <TABLE WIDTH=100% CELLPADDING=4 CELLSPACING=0>
@@ -113,11 +113,11 @@ class AddMeetingWebPage(eamm.base_webpage.WebPage):
         </TR>
         """
 
-        self.add_to_body(my_initial_meeting_form)
+        self.add_to_body(my_initial_meeting_invite_form)
         
         # the rest of the initial form is to get the requester to chose which template to base their meeting off.
         # we pull all the templates from the DB and show them to the user with radio buttons.
-        my_meeting_template = eamm.meeting_template.MeetingTemplate() 
+        my_meeting_template = eamm.backend.meeting_template.MeetingTemplate() 
         all_templates = my_meeting_template.get_all()
         
         for count in range(len(all_templates)):
@@ -217,14 +217,14 @@ class AddMeetingWebPage(eamm.base_webpage.WebPage):
         
         if idInvite == 0:
             # this is a new meeting, always rw.
-            my_meeting_invite = eamm.meeting_invite.MeetingInvite()
+            my_meeting_invite = eamm.backend.meeting_invite.MeetingInvite()
             my_meeting_invite.purpose = self.purpose
             my_meeting_invite.template = self.template
     
             self.title = "Create a new meeting invite!"
         elif idInvite > 0:
             # this is an existing meeting, check perms.
-            my_meeting_invite = eamm.meeting_invite.MeetingInvite(idInvite)
+            my_meeting_invite = eamm.backend.meeting_invite.MeetingInvite(idInvite)
             if perms == 'rw':
                 # print the form writable.
                 my_meeting_invite._writable = True

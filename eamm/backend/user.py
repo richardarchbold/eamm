@@ -15,7 +15,7 @@ __authors__ = [
   '"Richard  Archbold" <richardarchbold@gmail.com>',
 ]
 
-import eamm.database
+import eamm.backend.database
 import logging
 
 # setup basic logging config
@@ -65,7 +65,7 @@ class User(object):
         sql = "insert into User (full_name, email_addr, username, password) values ('%s', '%s', '%s', '%s')" % (full_name, email_addr, username, password)
     
         # no need to try/catch/rasie these, as the subclass takes care of that.
-        my_db_connection = eamm.database.MyDatabase()
+        my_db_connection = eamm.backend.database.MyDatabase()
         my_db_connection.insert(sql)  
         return True
     
@@ -82,7 +82,7 @@ class User(object):
         """       
 
         sql = "select count(*) from User where (email_addr = '%s' or username = '%s')" % (email_addr, username)
-        my_db_connection = eamm.database.MyDatabase()
+        my_db_connection = eamm.backend.database.MyDatabase()
         my_query_results = my_db_connection.select(sql)        # my_query_results is a dict of tuples.
         logging.info(my_query_results[0][0])
             

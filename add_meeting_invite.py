@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 """A one line summary of the module or script, terminated by a period.
 
@@ -21,7 +21,7 @@ __authors__ = [
 # using this to determine GET or POST.
 import os
 import logging
-import eamm.meeting_webpage
+import eamm.frontend.meeting_invite_webpage.py
 import cgi
 import cgitb; cgitb.enable()
 
@@ -29,15 +29,23 @@ import cgitb; cgitb.enable()
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
 
 def main():
-    this_webpage = eamm.meeting_webpage.AddMeetingWebPage();
-    
-    # if GET, we are displaying the form for input
-    # if POST, we are reading the form, validating it, saving it to the DB and displaying a message back to the user.
+    this_webpage = eamm.frontend.meeting_invite_webpage.AddMeetingWebPage();
     
     if os.environ['REQUEST_METHOD'] == 'GET':
-        this_webpage.display_add_meeting_initial_form()     
+        this_webpage.add_meeting_invite_step_1_form()
+             
     elif os.environ['REQUEST_METHOD'] == 'POST':
-        this_webpage.process_add_meeting_initial_form()    
+        form = cgi.FieldStorage()
+        form_method = form.getvalue('method')
+        
+        if form_method == 'add_meeting_invite_step_1_form':
+            this_webpage.add_meeting_invite_step_2_form()
+        elif form_method == 'add_meeting_invite_step_2_form':
+            this_webpage.add_meeting_invite_step_3_form()
+        elif form_method == 'add_meeting_invite_step_3_form':
+            this_webpage.add_meeting_invite_step_4_form()
+        else
+            logging.info('unknown post method: %s' % form_method)   
 
 if __name__ == '__main__':
     main()
