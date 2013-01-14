@@ -16,12 +16,16 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
     def __init__(self):
         super(MeetingInviteWebPage, self).__init__()
         self.js = """
+        
             <script type="text/javascript" src="/eamm/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
             <script type="text/javascript">
                 tinyMCE.init({
                 mode : "textareas"
                 });
             </script>
+            
+            <script src="/eamm/js/datetimepicker/datetimepicker_css.js"></script>
+            
             """
     
     def add_meeting_invite_step_1(self):
@@ -221,14 +225,10 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
     
         html += """
           <tr>
-            <td rowspan="7" class="col1">Logistics</td>
-            <td class="sub_col_1">Start Date</td>
-            <td class="sub_col_2"><input type="text" name="start_date"></td>
-          </tr>
-                    
-          <tr>
-            <td class="sub_col_1">Start Time</td>
-            <td class="sub_col_2"><input type="text" name="start_time"></td>
+            <td rowspan="6" class="col1">Logistics</td>
+            <td class="sub_col_1">Start Date & Time</td>
+            <td class="sub_col_2"><input type="text" id="start_date_time" name="start_date_time"/>
+            <img src="/eamm/js/datetimepicker/images2/cal.gif" onclick="javascript:NewCssCal ('start_date_time','yyyyMMdd','dropdown',true,'24')" style="cursor:pointer"/></td>
           </tr>
                     
           <tr>
@@ -269,5 +269,18 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         """
             
         self.add_to_body(html)
+
+    def add_meeting_invite_step_4(self, form):
+        self.set_title("Create a new meeting invite :: Step 4")
         
+        #purpose = form.getvalue('purpose')
+        #justification = form.getvalue('justification')
+        #id_template = form.getvalue('template')
+        #agenda = form.getvalue('agenda')
+        #title = form.getvalue('title')
+        
+        html = """
+        """
+        
+        self.add_to_body(html)
         

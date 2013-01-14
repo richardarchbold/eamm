@@ -16,7 +16,6 @@ def main():
     
     if os.environ['REQUEST_METHOD'] == 'GET':
         this_webpage.add_meeting_invite_step_1()
-        
     elif os.environ['REQUEST_METHOD'] == 'POST':
         form = cgi.FieldStorage()
         
@@ -33,8 +32,10 @@ def main():
                 this_webpage.add_meeting_invite_step_2(form)
             elif step == 'step2':
                 this_webpage.add_meeting_invite_step_3(form)
+            elif step == 'step3':
+                this_webpage.add_meeting_invite_step_4(form)
 
-        this_webpage.render()
+    this_webpage.render()
        
 if __name__ == '__main__':
     main()
