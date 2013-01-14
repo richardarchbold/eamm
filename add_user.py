@@ -8,14 +8,14 @@ Created on 3 Jan 2013
 # using this to determine GET or POST.
 import os
 import logging
-import eamm.frontend.add_user_webpage
+import eamm.frontend.user_webpage
 
 # setup basic logging config
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
 
 def main():
 
-    this_webpage = eamm.frontend.add_user_webpage.AddUserWebPage();
+    this_webpage = eamm.frontend.user_webpage.AddUserWebPage();
     
     # if GET, we are displaying the form for input
     # if POST, we are reading the form, validating it, saving it to the DB and displaying a message back to the user.
@@ -26,4 +26,3 @@ def main():
         
 if __name__ == "__main__":
     main()
-

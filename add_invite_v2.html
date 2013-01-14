@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>eamm :: $title </title>
+		<STYLE>
+			body {
+				background-color: #e6e6ff;
+				font-family: Arial, Helvetica, sans-serif;
+			}
+
+			table, tr, td {
+				border-collapse: collapse;
+				border: 2px solid black;
+				padding: 0.3cm;
+				vertical-align: center
+			}
+
+			table {
+				width: 800px;
+			}
+
+			.header {
+				background-color: #4700b8;
+				height: 28px;
+				padding: 0.3cm;
+				text-align: center;
+				font-size: 16pt;
+				font-weight: bold;
+			}
+
+			.col1 {
+				background-color: #00b8ff;
+				width: 120px;
+				font-weight: bold;
+			}
+			
+			.col2_top {
+				background-color: #99ccff;
+			}
+			
+			.col2_bottom {
+				background-color: #cfe7f5;
+			}
+			
+			.txt_area {
+				background-color: #C3FDB8;
+				padding: 0.1cm;
+			}
+			
+			.sub_col_1 {
+				width: 130px;
+				background-color: #cfe7f5;
+			}
+			
+			.sub_col_2 {
+				background-color: #cfe7f5;
+			}
+			
+		</style>
+
+		<script type="text/javascript">
+			function updateText(src) {
+				if (src.checked)
+					document.getElementById('textArea').value = src.value;
+			}
+		</script>
+		
+		<!-- OF COURSE YOU NEED TO ADAPT NEXT LINE TO YOUR tiny_mce.js PATH -->
+		<script type="text/javascript" src="/eamm/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
+		<script type="text/javascript">
+			tinyMCE.init({
+        	mode : "textareas"
+			});
+		</script>
+
+	</head>
+
+	<body>
+
+		<div align="center">
+
+			<form action="/eamm/add_meeting_invite.py" method="post">
+
+				<table>
+					<tr>
+						<td colspan="3" class="header">EAMM :: $title</td>
+					<tr>
+
+					<tr>
+						<td rowspan="2" class="col1">Purpose</td>
+						<td colspan="2" class="col2_top">It is critically important that your meeting has a clear
+						purpose. It should be clear to everyone why the meeting is taking in place, what should
+						be accomplished during the meeting, and what is expected of everyone. </td>
+					</tr>
+
+					<tr>
+						<td colspan="2" class="col2_bottom">						<textarea name="purpose" cols="80" rows="3" class="txt_area">$purpose</textarea></td>
+					</tr>
+
+					<tr>
+						<td rowspan="2" class="col1">Justification</td>
+						<td colspan="2" class="col2_top">Not every goal or task requires a meeting to be accomplished.
+						Why do you need to call a meeting in this instance?</td>
+					</tr>
+
+					<tr>
+						<td colspan="2" class="col2_bottom">						<textarea  name="justification" cols="80" rows="3" class="txt_area">$justification</textarea></td>
+					</tr>
+
+					<tr>
+						<td rowspan="5" class="col1">Template</td>
+						<td colspan="2" class="col2_top">Please	choose from one of the templates below to help set
+						your meetings agenda, structure and help set your post-meeting satisfaction survey
+						questions.</td>
+					</tr>
+
+					<tr>
+						<td class="sub_col_1">
+						<input onclick='updateText(this);' type="radio" name="template" value="id_template_1<br>test">
+						$template_1</td>
+						<td class="sub_col_2">$template_description_1</td>
+					</tr>
+
+					<tr>
+						<td class="sub_col_1">
+						<input onclick='updateText(this);' type="radio" name="template" value="id_template_2">
+						$template_2</td>
+						<td class="sub_col_2">$template_description_2</td>
+					</tr>
+
+					<tr>
+						<td class="sub_col_1">
+						<input onclick='updateText(this);' type="radio" name="template" value="id_template_3">
+						$template_3</td>
+						<td class="sub_col_2">$template_description_3</td>
+					</tr>
+
+					<tr>
+						<td class="sub_col_1">
+						<input onclick='updateText(this);' type="radio" name="template" value="id_template_4">
+						$template_4</td>
+						<td class="sub_col_2">$template_description_4</td>
+					</tr>
+
+					<tr>
+						<td rowspan="2" class="col1">Agenda</td>
+						<td colspan="2" class="col2_top">Effective Meetings are those that have drama and constructive
+						conflict. To help achieve this, the meeting leader should create an agenda
+						that:
+						<ul>
+							<LI>
+								Ensures	that the most important, engaging and controversial issues are discussed
+								first.
+							<LI>
+								Constructive conflict is surfaced, encouraged and discussed until a resolution is
+								found.
+						</UL></td>
+					</tr>
+
+					<tr>
+						<td colspan="2" class="col2_bottom"><textarea onclick="this.select();" id="agenda" name="agenda"> </textarea></td>
+					</tr>
+					<tr>
+						<td colspan="3" class="header"><input type="submit" value="submit" /></td>
+					</tr>
+				</table>
+
+			</form>
+
+		</div>
+
+	</body>
+
+</html>
+

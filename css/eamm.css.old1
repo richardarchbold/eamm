@@ -1,0 +1,145 @@
+body {
+  font-size: 9pt;
+  font-family: verdana, arial, sans-serif;
+}
+table {
+    border: 1px solid black;
+	border-collapse:collapse;
+	width: 800px; 
+	background-color: #1E90FF;
+}
+.table {
+    border: 1px;
+}
+
+table.list {
+  border-width: 0px 0px 1px 1px;
+  border-color: #EEBB00;
+  border-style: solid;	
+}
+tr {
+    border-color: #EEBB00;
+    border-style: solid;
+}
+td {
+  vertical-align: middle;
+  font-size: 9pt;
+  font-family: verdana, arial, sans-serif;
+  border-width: 1px 1px 1px 1px; 
+  padding-left: 2px;
+  padding-right: 2px;
+}
+th {
+  color: #000000;
+  background-color: #EEBB00;
+  border-color: #EEBB00;
+  vertical-align: middle;
+  font-size: 9pt;
+  font-family: verdana, arial, sans-serif;
+}
+div.good {
+  background-color: PaleGreen;
+  border: 1px solid #EEBB00;
+}
+div.bad {
+  background-color: red;
+  border: 1px solid #EEBB00;
+}
+td.fade {
+  background-color: #F2F2F2;
+  border-color: #E6E6E6;
+  border-style: solid;
+  vertical-align: middle;
+  text-decoration: none
+}
+tr.fade {
+  background-color: #F2F2F2
+  border-color: ##E6E6E6;
+  color: #BDBDBD;
+  border-style: solid;
+}
+td.good {
+  background-color: #98FB98;
+  border-color: #EEBB00;
+  border-style: solid;
+  vertical-align: middle;
+}
+td.bad {
+  background-color: #FFFFAA;
+  border-color: #EEBB00;
+  border-style: solid;
+}
+td.ugly {
+  background-color: #FFB4BF;
+  border-color: #EEBB00;
+  border-style: solid;
+}
+tr.good {
+  background-color: #98FB98;
+  border-color: #EEBB00;
+  border-style: solid;
+}
+tr.bad {
+  background-color: #FFFFAA;
+  border-color: #EEBB00;
+  border-style: solid;
+}
+tr.ugly {
+  background-color: #FFB4BF;
+  border-color: #EEBB00;
+  border-style: solid;
+}
+span.good {
+  background-color: #98FB98;
+  border-color: #EEBB00;
+  border-style: solid;
+  padding: 2px;
+  display: block;
+  margin: 4px 4px 4px 4px;
+}
+span.bad {
+  background-color: #FFFFAA;
+  border-color: #EEBB00;
+  border-style: solid;
+  padding: 2px;
+  display: block;
+  margin: 4px 4px 4px 4px;
+}
+span.ugly {
+  background-color: #FFB4BF;
+  border-color: #EEBB00;
+  border-style: solid;
+  padding: 2px;
+  display: block;
+  margin: 4px 4px 4px 4px;
+}
+
+
+/* 
+    
+    blue: FFFFCC      
+    
+*/
+
+.highlight {
+  color: #000000;
+  background-color: #EEBB00;
+  border-color: #EEBB00;
+  border-width: 1px 1px 1px 1px;
+  border-style: solid;
+}
+
+.list {
+  border-style: solid;
+  border-color: #EEBB00;
+  border-width: 1px 1px 1px 1px; 
+  vertical-align: middle;
+}
+
+.warning {
+  color: #FFB4BF;
+}
+
+img {
+	border: none;
+}

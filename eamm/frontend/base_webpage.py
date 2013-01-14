@@ -1,55 +1,43 @@
-"""This module provides webpage/html functionality common to all eamm webpages.
-
-  Class:
-      WebPage: The main class this module provides.
-      
-Source: https://github.com/richardarchbold/eamm
-Created: 3 Jan 2013
-"""
-
 import logging
 
 # setup basic logging config
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
 
 class WebPage(object):
-
-    """This class provides website/html functionality common to all eamm webpages.
-
-    Public Attributes:
-        none.
-    Public Methods:
-        display_add_user_form()
-        process_add_user_form()
-    """
-       
+      
     def __init__(self):
+        self.css = "css/eamm.css"
         self.title = "EAMM ::"
+        self.js = ""
         self.body = ""
-        self.bgcolor = "#E6E6FA"
         
     def set_title(self, title):
         self.title = self.title + ' ' + title
         if not self.body:
             self.body = """
+            <div align="center">
             <table>
-            <tr><td><img src="images/dilbert-meeting.jpg" width="234" height="211"/></td>
-            <td><h1>Efficient Automated Meeting Manager :: %s</h1></td></tr>
-            </table><br/><br/>
+            <tr>
+                <td class="header"><img src="images/dilbert-meeting.jpg" width="187" height="176"/></td>
+                <td class="header">Efficient Automated Meeting Manager :: %s</td>
+            </tr>
+            </table>
+            <br><br>
+            </div>
             """ % title
             
     def simple_table(self, message):
         html = """
-        <table width="400" border="border" align="center" bgcolor="#1E90FF">
-          <tr><td>%s</td></tr>
+        <table>
+          <tr><td class="txt_area">%s</td></tr>
         </table>
         """ % message
         return html
         
     def error_table(self, message):
         html = """
-        <table width="400" border="border" align="center" bgcolor="#FF0040">
-          <tr><td>%s</td></tr>
+        <table>
+          <tr><td class="error">%s</td></tr>
         </table>
         """ % message
         return html
@@ -59,12 +47,33 @@ class WebPage(object):
         
     def render(self):
         print "Content-type:text/html\r\n\r\n"
+        print "<!DOCTYPE html>"
         print "<html>"
         print "<head>"
+        print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />"
+        print "<link rel=stylesheet type=text/css href=\"%s\">" % self.css
+        if self.js:
+            print "%s" % self.js
         print "<title> %s </title>" % self.title
         print "</head>"
-        print "<body bgcolor=\"%s\">" % self.bgcolor
+        print "<body>"
+        print "<div align=\"center\">"
         print self.body
+        print "</div>"
         print "</body>"
         print "</html>\r\n\r\n"
         
+    def hide_past_form_contents(self, form):
+        
+        html = "\n"
+        
+        for key in form.keys():
+            
+            logging.info("form key: %s" % key)
+            
+            
+            if key != 'step':
+                html += '        <input type="hidden" name="%s" value="%s" />\n' % (key, form.getvalue(key))
+
+        return html
+    
