@@ -9,6 +9,7 @@ import cgitb; cgitb.enable(display=1)
 
 # setup basic logging config
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
+logging.info("======")
 
 def main():
 
@@ -18,8 +19,7 @@ def main():
         this_webpage.add_meeting_invite_step_1()
     elif os.environ['REQUEST_METHOD'] == 'POST':
         form = cgi.FieldStorage()
-        
-        logging.info(form.getlist('step'))
+        logging.info("form type: %s" % type(form))
         
         if not form.getvalue('step'):
             this_webpage.set_title("Add Meeting Invite :: Error")
@@ -34,6 +34,8 @@ def main():
                 this_webpage.add_meeting_invite_step_3(form)
             elif step == 'step3':
                 this_webpage.add_meeting_invite_step_4(form)
+            elif step == 'step4':
+                this_webpage.add_meeting_invite_step_5(form)
 
     this_webpage.render()
        

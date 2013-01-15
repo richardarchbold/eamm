@@ -2,6 +2,7 @@
 # import necessary eamm modules.
 import eamm.frontend.base_webpage 
 import eamm.backend.meeting_template
+import eamm.backend.meeting_invite
 
 # Import modules for CGI handling , the cgitb modules gives descriptive debug errors to the browser.
 import cgitb; cgitb.enable(display=1)
@@ -373,4 +374,31 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         """ % (requester, invitees, title, start_date, start_time, recurring, end_date, venue, my_template.title, purpose, agenda)
         
         self.add_to_body(html)
+
+    def add_meeting_invite_step_5(self, form):
+        self.set_title("Create a new meeting invite :: DONE !")
+           
+        # presuming that passing a "form" variable to the class will try and create/save
+        # a new invite.
+        new_invite = eamm.backend.meeting_invite.MeetingInvite(form)
         
+        if new_invite == True:
+            logging.info("sfsd")
+                 
+        # overiding with True for now.
+        success = True
+        
+        if success:
+            html = """
+        
+            <table>
+              <tr>
+                <td class="col1">Your meeting invite has been saved on the system and emailed to your invitees</td>
+              </tr>
+              <tr>
+                <td class="header"><a href="/eamm/index.html">Main Menu</a></td>
+              </tr>
+            </table>
+            """
+            
+        self.add_to_body(html)

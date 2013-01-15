@@ -1,47 +1,35 @@
-"""A one line summary of the module or script, terminated by a period.
+import logging
 
-Leave one blank line. The rest of this __doc__ string should contain an
-overall description of the module or script.  Optionally, it may also
-contain a brief description of exported classes and functions.
+# Import modules for CGI handling , the cgitb modules gives descriptive debug errors to the browser.
+import cgitb; cgitb.enable(display=1)
 
-    ClassFoo: One line summary.
-    functionBar(): One line summary.
-
-Source:http://github/richardarchbold/eamm.git
-Created: 7 Jan 2013
-"""
-__authors__ = [
-  # alphabetical order by last name, please
-  '"Richard  Archbold" <richardarchbold@gmail.com>',
-]
+# setup basic logging config
+logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
 
 class MeetingInvite(object):
-    """Summary of class here.
-
-    Longer class information....
-    Longer class information....
-
-    Public  Attributes:
-        likes_spam: A boolean indicating if we like SPAM or not.
-        eggs: An integer count of the eggs we have laid.
-    Public Methods:
-         name:  1 line summary
-    """
-    pass
     
-    def __init__(self):
-        """A one line summary of the function/method, eg: Fetch rows from a table.
-
-        Public Args:
-            Arg1: description
-            Arg2: description row to fetch.
-
-        Returns:
-            A dict mapping keys to the corresponding table row data
-            fetched. Each row is represented as a tuple of strings. For
+    def __init__(self, argg1=None):
         
-        Raises:
-            IOError: An error occurred accessing the table.Table object.
-        """
-            
+        if argg1 == None:
+            # no arguments passed
+            pass
+        elif type(argg1) is int:
+            # arg1 is an int, likely an existing id_meeting_invite
+            pass
+        elif argg1.getvalue('purpose'):
+            # arg1 is a form object instance.
+            logging.info("MeetingTemplate() was passed a form as an object")
+    
+        # purpose = form.getvalue('purpose')              # wysiwyg html string
+        # justification = form.getvalue('justification')  # wysiwyg html string
+        # id_template = form.getvalue('template')         # integer
+        # agenda = form.getvalue('agenda')                # wysiwyg html string
+        # title = form.getvalue('title')                  # string
+        # start_date = form.getvalue('start_date')        # yyyy-mm-dd string
+        # start_time = form.getvalue('start_time')        # hh:mm 24 hr strong 
+        # recurring = form.getvalue('recurring')          # string
+        # end_date = form.getvalue('end_date')            # yyyy-mm-dd string
+        # venue = form.getvalue('venue')                  # string
+        # requester = form.getvalue('requester')          # you@example.com string
+        # invitees = form.getvalue('invitees')            # wysiwyg html string            
         

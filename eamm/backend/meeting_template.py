@@ -9,9 +9,9 @@ logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
 
 class MeetingTemplate(object):
     
-    def __init__(self):
+    def __init__(self, arg1=None):
         sql = ""
-    
+
     def get_all(self):
         
         sql = '''
