@@ -24,8 +24,6 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
                 });
             </script>
             
-            <script src="/eamm/js/datetimepicker/datetimepicker_css.js"></script>
-            
             """
     
     def add_meeting_invite_step_1(self):
@@ -203,64 +201,76 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         <table>
           <tr>
             <td class="col1">Title</td>
-            <td colspan="2" class="col2_top">%s</td>
+            <td colspan="4" class="col2_top">%s</td>
           </tr>
           
           <tr>
             <td class="col1">Purpose</td>
-            <td colspan="2" class="col2_top">%s</td>
+            <td colspan="4" class="col2_top">%s</td>
           </tr>
             
           <tr>
             <td class="col1">Justification</td>
-            <td colspan="2" class="col2_top">%s</td>
+            <td colspan="4" class="col2_top">%s</td>
           </tr>
 
           <tr>
             <td class="col1">Agenda</td>
-            <td colspan="2" class="col2_top">%s</td>
+            <td colspan="4" class="col2_top">%s</td>
           </tr>
-        
         """ % (title, purpose, justification, agenda)
     
         html += """
           <tr>
-            <td rowspan="6" class="col1">Logistics</td>
-            <td class="sub_col_1">Start Date & Time</td>
-            <td class="sub_col_2"><input type="text" id="start_date_time" name="start_date_time"/>
-            <img src="/eamm/js/datetimepicker/images2/cal.gif" onclick="javascript:NewCssCal ('start_date_time','yyyyMMdd','dropdown',true,'24')" style="cursor:pointer"/></td>
+            <td rowspan="7" class="col1">Logistics</td>
+            <td class="sub_col_1">Start Date</td>
+            <td class="sub_col_2" colspan="3"><input type="text" name="start_date_time" value="yyyy-mm-dd"/></td>
           </tr>
-                    
+        
+          <tr>
+            <td class="sub_col_1">Start Time (24 hr format)</td>
+            <td class="sub_col_2" colspan="3"><input type="text" name="start_time" value="hh:mm"/></td>
+          </tr>
+          
           <tr>
             <td class="sub_col_1">Duration</td>
-            <td class="sub_col_2"><input type="text" name="duration"></td>
+            <td class="sub_col_2" colspan="3"><input type="text" name="duration" value="mm"/></td>
           </tr>
                    
           <tr>
-            <td class="sub_col_1">Recurring</td>
-            <td class="sub_col_2"><input type="text" name="recurring"></td>
+            <td class="sub_col_1">Repeats</td>
+            <td class="sub_col_2">
+              <select name="recurring">
+                <option value="none">none</option>
+                <option value="daily">daily</option>
+                <option value="weekly">weekly</option>
+                <option value="monthly">monthly</option>
+                <option value="quarterly">quarterly</option>
+              </select>
+            </td>
+            <td class="sub_col_1">End Date</td>
+            <td class="sub_col_2"><input type="text" name="end_date" value="yyyy-mm-dd"/></td>
           </tr>
 
           <tr>
             <td class="sub_col_1">Venue</td>
-            <td class="sub_col_2"><input type="text" name="venue"></td>
+            <td class="sub_col_2" colspan="3"><input type="text" name="venue" size="50"></td>
           </tr>
                     
           <tr>
-            <td class="sub_col_1">Requestor</td>
-            <td class="sub_col_2"><input type="text" name="requestor"></td>
+            <td class="sub_col_1">Requester</td>
+            <td class="sub_col_2" colspan="3"><input type="text" name="requester" value="you@example.com" size="50"/></td>
           </tr>
                         
           <tr>
             <td class="sub_col_1">Invitees</td>
-            <td class="sub_col_2"><textarea class="txt_area" cols="80" rows="10" name="invitees">each invitee email address should be on a new line</textarea></td>
+            <td class="sub_col_2" colspan="3"><textarea class="txt_area" cols="80" rows="10" name="invitees">each invitee email address should be on a new line</textarea></td>
           </tr>
-        
         """
     
         html += """
           <tr>
-            <td colspan="3" class="header"><input type="submit" value="submit" /></td>
+            <td colspan="5" class="header"><input type="submit" value="Next" /></td>
           </tr>
           
         </table>
@@ -271,16 +281,96 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         self.add_to_body(html)
 
     def add_meeting_invite_step_4(self, form):
-        self.set_title("Create a new meeting invite :: Step 4")
+        self.set_title("Create a new meeting invite :: Step 4 (last one!")
         
-        #purpose = form.getvalue('purpose')
+        purpose = form.getvalue('purpose')
         #justification = form.getvalue('justification')
-        #id_template = form.getvalue('template')
-        #agenda = form.getvalue('agenda')
-        #title = form.getvalue('title')
+        id_template = form.getvalue('template')
+        agenda = form.getvalue('agenda')
+        title = form.getvalue('title')
+        start_date = form.getvalue('start_date')
+        start_time = form.getvalue('start_time')
+        recurring = form.getvalue('recurring')
+        end_date = form.getvalue('end_date')
+        venue = form.getvalue('venue')
+        requester = form.getvalue('requester')
+        invitees = form.getvalue('invitees')
+        
+        
+        my_template = eamm.backend.meeting_template.MeetingTemplate()
+        my_template.get(id_template)
         
         html = """
+        <form name="add_user" method="post" action="/eamm/add_meeting_invite.py"> 
+        <input type="hidden" name="step" value="step4" />
         """
+        
+        html += self.hide_past_form_contents(form)
+        
+        html += """
+        <table>
+        
+          <tr>
+            <td class="col1">From:</td>
+            <td colspan="2" class="col2_top">%s</td>
+          </tr>
+        
+          <tr>
+            <td class="col1">To:</td>
+            <td colspan="2" class="col2_top">%s</td>
+          </tr>  
+          
+          <tr>
+            <td class="col1">Subject:</td>
+            <td colspan="2" class="col2_top">%s</td>
+          </tr>
+          
+          <tr>
+            <td rowspan="6" class="col1">Logistics:</td>
+            <td class="col1">Start Date:</td>
+            <td class="col2_top">%s</td>
+          </tr>
+          
+          <tr>
+            <td class="col1">Start Time:</td>
+            <td class="col2_top">%s</td>
+          </tr>
+          
+          <tr>
+            <td class="col1">Repeating:</td>
+            <td class="col2_top">%s</td>
+          </tr>
+          
+          <tr>
+            <td class="col1">Until:</td>
+            <td class="col2_top">%s</td>
+          </tr>
+          
+          <tr>
+            <td class="col1">Venue:</td>
+            <td class="col2_top">%s</td>
+          </tr>
+          
+          <tr>
+            <td class="col1">From Template:</td>
+            <td class="col2_top">%s</td>
+          </tr>
+          
+           <tr>
+            <td class="col1">Purpose:</td>
+            <td colspan="2" class="col2_top">%s</td>
+          </tr>
+          
+          <tr>
+            <td class="col1">Agenda:</td>
+            <td colspan="2" class="col2_top">%s</td>
+          </tr>
+          
+          <tr>
+            <td class="header" colspan="3"><input type="submit" value="Save and Send"/></td>
+          </tr>
+        </table>
+        """ % (requester, invitees, title, start_date, start_time, recurring, end_date, venue, my_template.title, purpose, agenda)
         
         self.add_to_body(html)
         
