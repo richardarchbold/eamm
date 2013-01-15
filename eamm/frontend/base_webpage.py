@@ -64,13 +64,10 @@ class WebPage(object):
         print "</html>\r\n\r\n"
         
     def hide_past_form_contents(self, form):
-        
         html = "\n"
         
         for key in form.keys():
-            
             logging.info("form key: %s" % key)
-            
             
             if key != 'step':
                 html += '        <input type="hidden" name="%s" value="%s" />\n' % (key, form.getvalue(key))
