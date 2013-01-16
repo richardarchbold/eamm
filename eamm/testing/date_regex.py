@@ -3,14 +3,13 @@
 import re
 
 def main():
-    my_date = "2013-13-09"
+    my_date = "2013-01-01"
 
     # result = re.match(pattern, string)
     result = re.match(r"^20\d\d-([01]\d)-([0-3]\d$)", my_date)
     
     #crap = result.group(1)
     #print(crap)
-        
     
     if result == None:
         print("match not found")

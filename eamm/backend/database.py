@@ -84,7 +84,7 @@ class MyDatabase(object):
         self.db.close()
         return rows
     
-    def insert(self, insert_stmt):
+    def insert(self, insert_stmt, auto_increment=None):
         """Execute an insert statement against the DB.
 
         Args:
@@ -101,6 +101,11 @@ class MyDatabase(object):
             cursor.execute(insert_stmt)
             # Commit your changes in the database
             self.db.commit()
+            if auto_increment:
+                cursor.execute("SELECT LAST_INSERT_ID()")
+                row = cursor.fetchone()
+                id = row[0]
+                logging.info("auto_increment: %s" % id)
         except:
             # Rollback in case there is any error
             self.db.rollback()
@@ -108,3 +113,6 @@ class MyDatabase(object):
 
         # disconnect from server
         self.db.close()
+        
+        if auto_increment:
+            return id

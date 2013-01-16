@@ -225,7 +225,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
           <tr>
             <td rowspan="7" class="col1">Logistics</td>
             <td class="sub_col_1">Start Date</td>
-            <td class="sub_col_2" colspan="3"><input type="text" name="start_date_time" value="yyyy-mm-dd"/></td>
+            <td class="sub_col_2" colspan="3"><input type="text" name="start_date" value="yyyy-mm-dd"/></td>
           </tr>
         
           <tr>
@@ -291,6 +291,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         title = form.getvalue('title')
         start_date = form.getvalue('start_date')
         start_time = form.getvalue('start_time')
+        duration = form.getvalue('duration')
         recurring = form.getvalue('recurring')
         end_date = form.getvalue('end_date')
         venue = form.getvalue('venue')
@@ -327,13 +328,18 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
           </tr>
           
           <tr>
-            <td rowspan="6" class="col1">Logistics:</td>
+            <td rowspan="7" class="col1">Logistics:</td>
             <td class="col1">Start Date:</td>
             <td class="col2_top">%s</td>
           </tr>
           
           <tr>
             <td class="col1">Start Time:</td>
+            <td class="col2_top">%s</td>
+          </tr>
+          
+          <tr>
+            <td class="col1">Duration:</td>
             <td class="col2_top">%s</td>
           </tr>
           
@@ -371,7 +377,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
             <td class="header" colspan="3"><input type="submit" value="Save and Send"/></td>
           </tr>
         </table>
-        """ % (requester, invitees, title, start_date, start_time, recurring, end_date, venue, my_template.title, purpose, agenda)
+        """ % (requester, invitees, title, start_date, start_time, duration, recurring, end_date, venue, my_template.title, purpose, agenda)
         
         self.add_to_body(html)
 
@@ -382,23 +388,22 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         # a new invite.
         new_invite = eamm.backend.meeting_invite.MeetingInvite(form)
         
-        if new_invite == True:
-            logging.info("sfsd")
-                 
-        # overiding with True for now.
-        success = True
+        if new_invite.is_valid:
+            if new_invite.add():
+                html = """
         
-        if success:
-            html = """
-        
-            <table>
-              <tr>
-                <td class="col1">Your meeting invite has been saved on the system and emailed to your invitees</td>
-              </tr>
-              <tr>
-                <td class="header"><a href="/eamm/index.html">Main Menu</a></td>
-              </tr>
-            </table>
-            """
+                <table>
+                  <tr>
+                    <td class="col1">Your meeting invite has been saved on the system and emailed to your invitees</td>
+                  </tr>
+                  <tr>
+                    <td class="header"> Return to <a href="/eamm/index.html">Main Menu</a></td>
+                  </tr>
+                </table>
+                """
+            else:
+                html = self.error_table("ERROR: valid invite for some reason :-(")
+        else:
+            html = self.error_table("ERROR: Could not add invite: %s" % new_invite.error)
             
         self.add_to_body(html)
