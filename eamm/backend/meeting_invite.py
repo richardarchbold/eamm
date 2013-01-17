@@ -42,8 +42,7 @@ class MeetingInvite(object):
             
             # error back to the calling class if we can't load the form.
             self.__load_form(form)
-       
-       
+            
     def add(self):
         """add needs to do a few things:
         
@@ -98,57 +97,96 @@ class MeetingInvite(object):
         #   background_reading, agenda, requester_email_addr, venue, idMeetingTemplate  
 
         # set up the insert sql stmt
-        sql = '''
+        #sql = '''
+        #INSERT into Invite (start_date, duration, end_date, recurring, invite_status, title, 
+        #                    purpose, background_reading, agenda, requester_email_addr, venue, 
+        #                    idMeetingTemplate) 
+        #VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s")
+        #''' % (self.start_datetime, self.duration, self.end_datetime, self.recurring, "ACTIVE", 
+        #             self.title, self.purpose, "NONE", self.agenda, self.requester, self.venue, 
+        #             self.id_template)
+        
+        sql = """
         INSERT into Invite (start_date, duration, end_date, recurring, invite_status, title, 
                             purpose, background_reading, agenda, requester_email_addr, venue, 
                             idMeetingTemplate) 
-        VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s")
-        ''' % (self.start_datetime, self.duration, self.end_datetime, self.recurring, "ACTIVE", \
-                     self.title, self.purpose, "NONE", self.agenda, self.requester, self.venue, \
-                     self.id_template)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """ 
+        sql_vars= [self.start_datetime, self.duration, self.end_datetime, self.recurring, "ACTIVE", 
+                   self.title, self.purpose, "NONE", self.agenda, self.requester, self.venue,
+                   self.id_template]
+        
         # Specify that this is an insert with an auto-incrementing PK.
         auto_increment = True       
 
-        # open up a connection to the DB
+        # open up a connection to the DB, check to make sure it worked
         my_db_connection = eamm.backend.database.MyDatabase()
-        
-        # execute the insert, if it worked, the returned value will be the auto-incremented pk value
-        # for the fresh insert.
-        logging.info("Adding Meeting Invite \"%s\" to the Invite tbl" % self.title)
-        my_last_insert_id = my_db_connection.insert(sql, auto_increment)
-        #logging.info("my_last_insert_id: type(%s), value %s" % (type(my_last_insert_id), my_last_insert_id))
-
-        # check that the return code is indeed good, and use it to set self.id_invite
-        if type(my_last_insert_id) is long:  
-            self.id_invite = my_last_insert_id
-            logging.info("self.id_invite has been set to %s", self.id_invite)
-            return True
-        else:
+        if not my_db_connection:
             self.is_valid = False
-            self.error = "self.id_invite could not be set"
-            logging.info("self.id_invite could not be set")
+            self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, ERROR: Couldn't create \
+                          MyDatabase object"
             return False
+                
+        # execute the insert2, if it worked, the returned value will be the auto-incremented 
+        # PK value for the fresh insert
+        my_last_insert_id = my_db_connection.insert2(sql, sql_vars, auto_increment)
+        if not my_last_insert_id:      
+            self.is_valid = False
+            self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, Error: Couldn't \
+            insert row, Message: %s" % my_db_connection.error
+            return False
+        else:
+            logging.info("Class:MeetingInvite, Method: __add_to_invite_tbl, my_last_insert_id: \
+            type(%s), value %s" % (type(my_last_insert_id), my_last_insert_id))
+            # check that the return code is indeed good, and use it to set self.id_invite
+            if my_last_insert_id > 0:  
+                self.id_invite = my_last_insert_id
+                logging.info("Class:MeetingInvite, Method: __add_to_invite_tbl, self.id_invite has \
+                been set to %s", self.id_invite)
+                return True
+            else:
+                self.is_valid = False
+                self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, error: self.id_invite \
+                could not be set, last_insert_id is %s" % my_last_insert_id
+                logging.info(self.error)
+                return False
 
     
-    def __already_exists(self):
+    def __already_exists(self):    
         sql = """
         SELECT count(*) from Invite 
-        WHERE (start_date='%s' AND duration='%s' AND invite_status='ACTIVE' AND title='%s' AND
-               purpose='%s' AND agenda='%s' AND requester_email_addr='%s')
-        """ % (self.start_datetime, self.duration, self.title, self.purpose, self.agenda, self.requester)
-        #logging.info("__already_exists sql: %s" % sql)
+        WHERE (start_date=%s AND duration=%s AND invite_status='ACTIVE' AND title=%s AND
+               purpose=%s AND agenda=%s AND requester_email_addr=%s)
+        """
         
+        sql_vars = [self.start_datetime, self.duration, self.title, self.purpose, self.agenda, 
+                    self.requester]
+        
+        # open a DB connection and check it.
         my_db_connection = eamm.backend.database.MyDatabase()
-        my_query_results = my_db_connection.select(sql)
-        if my_query_results[0][0] == 0:
-            # this means the select got back nothing.
-            logging.info("Invite for %s does NOT already exist in DB" % self.title)
+        if not my_db_connection:
+            self.is_valid = False
+            self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, ERROR: Couldn't create \
+                          MyDatabase object"
+            return False
+        
+        # execute the select and check to make sure it worked.
+        my_query_results = my_db_connection.select2(sql, sql_vars)
+        if not my_query_results:
+            self.is_valid = False
+            self.error = "Class:MeetingInvite, Method: __already_exists, Error: Couldn't \
+                          select row, Message: %s" % my_db_connection.error
             return False
         else:
-            logging.info("Invite for %s DOES already exist in DB" % self.title)
-            self.error = "Invite for meeting with Title \"%s\" DOES already exist in DB" % self.title
-            self.is_valid = False
-            return True
+            if my_query_results[0][0] == 0:
+                # this means the select got back nothing.
+                logging.info("Invite for %s does NOT already exist in DB" % self.title)
+                return 0
+            else:
+                logging.info("Invite for %s DOES already exist in DB" % self.title)
+                self.error = "Invite for meeting with Title \"%s\" DOES already exist in DB" % self.title
+                self.is_valid = False
+                return True
 
     
     def __load_form(self, form):
@@ -161,7 +199,8 @@ class MeetingInvite(object):
                     form.getvalue('end_date'), form.getvalue('venue'),
                     form.getvalue('requester'), form.getvalue('invitees'))):
             self.is_valid = False
-            self.error = "Not all form fields contain data"
+            self.error = "Class:MeetingInvite, Method: __load_form, Error:Not all form fields \
+            contain data"
             return False
         
         self.purpose = form.getvalue('purpose')              # wysiwyg html string
@@ -178,8 +217,14 @@ class MeetingInvite(object):
         self.requester = form.getvalue('requester')          # you@example.com string
         self.invitees = form.getvalue('invitees')            # wysiwyg html string    
         
-        self.__validate()
-        return
+        if not self.__validate():
+            self.is_valid = False
+            self.error = "Class:MeetingInvite, Method: __load_form, ERROR: Couldn't validate \
+            form" 
+            logging.info(self.error)
+            return False
+        else:
+            return True
     
     
     def __validate(self):
@@ -200,6 +245,7 @@ class MeetingInvite(object):
         if result == None:
             self.is_valid = False
             self.error = "bad start date: %r" % self.start_date
+            logging.info("Class:MeetingInvite, Method: __validate, ERROR: %s" % self.error)
         #else:
             #logging.info("good start_date: %s" % self.start_date)
         
@@ -207,6 +253,7 @@ class MeetingInvite(object):
         if result2 == None:
             self.is_valid = False
             self.error = "bad end_date: %r" % self.end_date
+            logging.info("Class:MeetingInvite, Method: __validate, ERROR: %s" % self.error)
         #else:
         #    logging.info("good end_date: %s" % self.end_date)
 
@@ -214,6 +261,7 @@ class MeetingInvite(object):
         if result3 == None:
             self.is_valid = False
             self.error = "bad start_time: %r" % self.start_time
+            logging.info("Class:MeetingInvite, Method: __validate, ERROR: %s" % self.error)
         #else:
         #    logging.info("good start_time: %s" % self.start_time)
 
@@ -221,10 +269,13 @@ class MeetingInvite(object):
         if result4 == None:
             self.is_valid = False
             self.error = "bad duration: %r" % self.duration
+            logging.info("Class:MeetingInvite, Method: __validate, ERROR: %s" % self.error)
         #else:
         #    logging.info("good duration: %s" % self.duration)
         
-
+        return self.is_valid
+        
+        
 def __cleanup_crud(self):
     # delete any leftover crud from DB, pitty we're not using transactions here :-(
     sql = """

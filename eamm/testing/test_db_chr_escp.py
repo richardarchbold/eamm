@@ -9,29 +9,21 @@ def main():
     db_name = "test"
 
     
-    select_stmt = """
-    SELECT * from test.tbl1 where idtbl1=%s AND col2=%s AND col3=%s 
+    sql = """
+    insert into tbl1 (col2, col3) values ('a', 'aaaaaaa')  
     """
-    var1 = "a'a"
-    var2 = "b"
-    var3 = """c'"c"""
     
-    sql_vars = [var1, var2, var3]
+    db = MySQLdb.connect (host = db_host, 
+                          user = db_user,
+                          passwd = db_pass,
+                          db = db_name)
+    cursor = db.cursor()
+    cursor.execute(sql)
+    cursor.execute("SELECT LAST_INSERT_ID()")
+    row = cursor.fetchone()
     
-    print(sql_vars)
-    print(select_stmt % tuple(sql_vars))
-    
-    try:
-        db = MySQLdb.connect (host = db_host, 
-                              user = db_user,
-                              passwd = db_pass,
-                              db = db_name)
-        cursor = db.cursor()
-        cursor.execute(select_stmt, tuple(sql_vars))
-        rows = cursor.fetchone()
-        print ("row: %s, %s, %s" % tuple(rows))    
-    except:
-        raise
+    print("row type is: %s" % type(row))
+    print("row[0]: %s" % row[0])
     
     cursor.close()
     db.close()

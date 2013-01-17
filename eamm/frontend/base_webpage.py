@@ -45,6 +45,11 @@ class WebPage(object):
 
     def add_to_body(self, body):
         self.body = self.body + ' ' + body
+    
+    def error_exit(self, error):
+        self.title = "ERROR"
+        self.add_to_body(self.error_table(error))
+        self.render()
         
     def render(self):
         print "Content-type:text/html\r\n\r\n"
