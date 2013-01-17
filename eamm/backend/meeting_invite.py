@@ -11,7 +11,19 @@ import re
 logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
 
 class MeetingInvite(object):
+    """
+    * MeetingInvite(form), create a new MeetingInvite object, initialize values from a form
+        * MeetingInvite.__init__(form)
+            * MeetingInvite.__load_form_form(form), sets self.XXX values
+                * MeetingInvite.__validate(), validates self.XXX values.
     
+     if MeetingInvite.is_valid:     (is_valid is a bool set by __validate()
+            if MeetingInvite.add():
+                check if MeetingInvite.__already_exists, check if it already exists.
+                MeetingInvite.__add_to_invite_tbl, use auto_increment to set self.id_invite.
+                Meeting(), create a new meeting object
+                Meeting.add(id_invite, start_datetime, end_datetime, meeting_chair)
+    """
     def __init__(self, arg1=None):    
         # by default, a new object is True, self.__validate() will update the status.
         self.is_valid = True
@@ -49,21 +61,36 @@ class MeetingInvite(object):
         self.end_datetime = self.end_date + " " + self.start_time + ":00"
         
         if not self.__already_exists():
-            self.__add_to_invite_tbl()
-            # add to meeting table
-            # add to participant table
+            # 1. add to invite tbl
+            # 2. add to meeting tbl
+            # 3. add to participant tbl
             
+            # 1. add to invite tbl
+            self.__add_to_invite_tbl()
+            # if the __add_to_invite_tbl failed, it will set the is_valid bool to false and stick the
+            # error message is self.error
+            if self.is_valid == False:
+                return False
+                
+            # 2. add to meeting tbl, a la Meeting.add() 
             if (self.recurring == "none"):
                 my_meeting = eamm.backend.meeting.Meeting()
-                # meeting.add(id_invite, start_datetime, end_datetime, meeting_chair)
                 my_meeting.add(self.id_invite, self.start_datetime, self.end_datetime, self.requester)
-                
-                # if it worked, my_meeting.id_meeting will be an int, if it failed, it will be False
-                if type(my_meeting.id_meeting) is int:
-                    return True
-                else:
+                # if the add() method failed, it will set the is_valid bool to false and stick the
+                # error message is self.error
+                if my_meeting.is_valid == False:
+                    self.is_valid = False
+                    self.error = my_meeting.error
+                    self.__cleanup_crud(self.id_invite)
                     return False
-            # TODO: this is where we flesh out the recurring shit.
+                else:
+                    # we made it, everything added!
+                    return True
+            else:
+                # we'll deal with recurring meetings later
+                # TODO
+                pass
+            
             
     def __add_to_invite_tbl(self):
         # row format:
@@ -71,12 +98,12 @@ class MeetingInvite(object):
         #   background_reading, agenda, requester_email_addr, venue, idMeetingTemplate  
 
         # set up the insert sql stmt
-        sql = """
+        sql = '''
         INSERT into Invite (start_date, duration, end_date, recurring, invite_status, title, 
                             purpose, background_reading, agenda, requester_email_addr, venue, 
                             idMeetingTemplate) 
-        VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
-        """ % (self.start_datetime, self.duration, self.end_datetime, self.recurring, "ACTIVE", \
+        VALUES ("%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s", "%s")
+        ''' % (self.start_datetime, self.duration, self.end_datetime, self.recurring, "ACTIVE", \
                      self.title, self.purpose, "NONE", self.agenda, self.requester, self.venue, \
                      self.id_template)
         # Specify that this is an insert with an auto-incrementing PK.
@@ -87,14 +114,19 @@ class MeetingInvite(object):
         
         # execute the insert, if it worked, the returned value will be the auto-incremented pk value
         # for the fresh insert.
+        logging.info("Adding Meeting Invite \"%s\" to the Invite tbl" % self.title)
         my_last_insert_id = my_db_connection.insert(sql, auto_increment)
+        #logging.info("my_last_insert_id: type(%s), value %s" % (type(my_last_insert_id), my_last_insert_id))
 
-        
         # check that the return code is indeed good, and use it to set self.id_invite
-        if type(my_last_insert_id) is int:  
+        if type(my_last_insert_id) is long:  
             self.id_invite = my_last_insert_id
+            logging.info("self.id_invite has been set to %s", self.id_invite)
             return True
         else:
+            self.is_valid = False
+            self.error = "self.id_invite could not be set"
+            logging.info("self.id_invite could not be set")
             return False
 
     
@@ -104,15 +136,18 @@ class MeetingInvite(object):
         WHERE (start_date='%s' AND duration='%s' AND invite_status='ACTIVE' AND title='%s' AND
                purpose='%s' AND agenda='%s' AND requester_email_addr='%s')
         """ % (self.start_datetime, self.duration, self.title, self.purpose, self.agenda, self.requester)
-        
-        logging.info("__already_exists sql: %s" % sql)
+        #logging.info("__already_exists sql: %s" % sql)
         
         my_db_connection = eamm.backend.database.MyDatabase()
         my_query_results = my_db_connection.select(sql)
         if my_query_results[0][0] == 0:
             # this means the select got back nothing.
+            logging.info("Invite for %s does NOT already exist in DB" % self.title)
             return False
         else:
+            logging.info("Invite for %s DOES already exist in DB" % self.title)
+            self.error = "Invite for meeting with Title \"%s\" DOES already exist in DB" % self.title
+            self.is_valid = False
             return True
 
     
@@ -165,26 +200,40 @@ class MeetingInvite(object):
         if result == None:
             self.is_valid = False
             self.error = "bad start date: %r" % self.start_date
-        else:
-            logging.info("good start_date: %s" % self.start_date)
+        #else:
+            #logging.info("good start_date: %s" % self.start_date)
         
         result2 = re.search(regex_date, self.end_date)
         if result2 == None:
             self.is_valid = False
             self.error = "bad end_date: %r" % self.end_date
-        else:
-            logging.info("good end_date: %s" % self.end_date)
+        #else:
+        #    logging.info("good end_date: %s" % self.end_date)
 
         result3 = re.search(regex_time, self.start_time)
         if result3 == None:
             self.is_valid = False
             self.error = "bad start_time: %r" % self.start_time
-        else:
-            logging.info("good start_time: %s" % self.start_time)
+        #else:
+        #    logging.info("good start_time: %s" % self.start_time)
 
         result4 = re.search(regex_duration, self.duration)
         if result4 == None:
             self.is_valid = False
             self.error = "bad duration: %r" % self.duration
-        else:
-            logging.info("good duration: %s" % self.duration)
+        #else:
+        #    logging.info("good duration: %s" % self.duration)
+        
+
+def __cleanup_crud(self):
+    # delete any leftover crud from DB, pitty we're not using transactions here :-(
+    sql = """
+    DELETE FROM Invite WHERE idInvite='%s' LIMIT 1
+    """
+    
+    # open up a connection to the DB
+    my_db_connection = eamm.backend.database.MyDatabase()
+        
+    # execute the cleanup delete stmt.
+    logging.info("Cleaning up and deleting Meeting Invite \"%s\" from the Invite tbl" % self.id_invite)
+    my_db_connection.delete(sql)

@@ -69,17 +69,44 @@ class MyDatabase(object):
         Raises:
             none.
         """
-        logging.info("SELECT: %s " % select_stmt)
+        logging.info("SELECT:\n%s " % select_stmt)
         try:
             cursor = self.db.cursor()
             cursor.execute(select_stmt)
             rows = cursor.fetchall()    
-            my_type = type(rows)
-            logging.info("rows type is %s", my_type)
         except:
             logging.info("MySQLdb.select(%s) failed" % select_stmt)
             raise
         logging.info("SELECT: returned %s rows" % len(rows))
+        cursor.close()
+        self.db.close()
+        return rows
+    
+    def select2(self, select_stmt, sql_vars=None):
+        logging.info("SELECT2:\nsql:%s" % select_stmt)
+        
+        cursor = self.db.cursor()
+        
+        if sql_vars:
+            if type(sql_vars) is list:
+                logging.info("SELECT2: *was* passed a list of variables for substitution")
+                for i in len(sql_vars):
+                    logging.info("sql_vars[%s] = %s" % (i, sql_vars[i]))
+                try:
+                    cursor.execute(select_stmt, tuple(sql_vars))  
+                except:
+                    logging.info("MySQLdb.select(%s) failed while using sql_vars" % select_stmt)
+                    raise
+        else:    
+            logging.info("SELECT2: *was not* passed a list of variables for substitution")
+            try:
+                cursor.execute(select_stmt)  
+            except:
+                logging.info("MySQLdb.select(%s) failed" % select_stmt)
+                raise
+            
+        rows = cursor.fetchall()
+        logging.info("SELECT2: returned %s rows" % len(rows)) 
         cursor.close()
         self.db.close()
         return rows
@@ -94,7 +121,7 @@ class MyDatabase(object):
         Raises:
             MySQLdb.execute error.
         """
-        logging.info("INSERT: ", insert_stmt)
+        logging.info("INSERT:\n%s" % insert_stmt)
         try:
             # Execute the SQL command
             cursor = self.db.cursor()
@@ -104,8 +131,8 @@ class MyDatabase(object):
             if auto_increment:
                 cursor.execute("SELECT LAST_INSERT_ID()")
                 row = cursor.fetchone()
-                id = row[0]
-                logging.info("auto_increment: %s" % id)
+                my_id = row[0]
+                logging.info("INSERT last auto_increment value: %s" % my_id)
         except:
             # Rollback in case there is any error
             self.db.rollback()
@@ -116,3 +143,20 @@ class MyDatabase(object):
         
         if auto_increment:
             return id
+        
+
+    def delete(self, delete_stmt):
+        logging.info("DELETE:\n%s" % delete_stmt)
+        try:
+            # Execute the SQL command
+            cursor = self.db.cursor()
+            cursor.execute(delete_stmt)
+            # Commit your changes in the database
+            self.db.commit()
+        except:
+            # Rollback in case there is any error
+            self.db.rollback()
+            raise
+
+        # disconnect from server
+        self.db.close()

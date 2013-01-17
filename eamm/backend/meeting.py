@@ -12,12 +12,13 @@ class Meeting(object):
     pass
     
     def __init__(self):
-        """ blah, blah
+        """ init
         """
         self.id_Meeting = False
+        self.is_valid = True
+        self.error = None
     
     def add(self, id_invite, start_datetime, end_datetime, meeting_chair):
-        
         self.id_invite = id_invite
         self.start_datetime = start_datetime
         self.end_datetime = end_datetime
@@ -25,7 +26,7 @@ class Meeting(object):
         
         # idMeeting idInvite meeting_status start_time end_time meeting_chair meeting_minute_notes
         sql = """
-        INSERT INTO Meeting (idInvite, meeting_status, start_time, end_time, meeting_char) VALUES 
+        INSERT INTO Meeting (idInvite, meeting_status, start_time, end_time, meeting_chair) VALUES 
         ('%s', 'SCHEDULED', '%s', '%s', '%s')
         """ % (self.id_invite, self.start_datetime, self.end_datetime, self.meeting_chair)
         
@@ -37,13 +38,18 @@ class Meeting(object):
         
         # execute the insert, if it worked, the returned value will be the auto-incremented pk value
         # for the fresh insert.
+        logging.info("Adding Meeting with id_invite of \"%s\" to the Meeting tbl DB" % self.id_invite)
         my_last_insert_id = my_db_connection.insert(sql, auto_increment)
 
         # check that the return code is indeed good, and use it to set self.id_invite
-        if type(my_last_insert_id) is int:  
+        if my_last_insert_id > 0:  
             self.id_meeting = my_last_insert_id
+            logging.info("self.id_meeting has been set to %s", self.id_meeting)
             return True
         else:
+            self.is_valid = False
+            self.error = "self.id_meeting could not be set"
+            logging.info("self.id_meeting could not be set")
             return False
 
         

@@ -394,7 +394,8 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         
                 <table>
                   <tr>
-                    <td class="col1">Your meeting invite has been saved on the system and emailed to your invitees</td>
+                    <td class="col1">Your meeting invite has been saved on the system and emailed to 
+                                     your invitees</td>
                   </tr>
                   <tr>
                     <td class="header"> Return to <a href="/eamm/index.html">Main Menu</a></td>
@@ -402,8 +403,10 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
                 </table>
                 """
             else:
-                html = self.error_table("ERROR: valid invite for some reason :-(")
+                html = self.error_table("ERROR: eamm.backend.meeting_invite.MeetingInvite.add() failed \
+                                         with message <b>%s</b>" % new_invite.error)
         else:
-            html = self.error_table("ERROR: Could not add invite: %s" % new_invite.error)
+            html = self.error_table("ERROR: eamm.backend.meeting_invite.MeetingInvite(form) \
+                                         failed with message <b>%s</b>" % new_invite.error)
             
         self.add_to_body(html)
