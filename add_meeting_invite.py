@@ -9,17 +9,18 @@ import cgitb; cgitb.enable(display=1)
 
 # setup basic logging config
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
-logging.info("======")
+
 
 def main():
 
+    logging.info("======")
     this_webpage = eamm.frontend.meeting_invite_webpage.MeetingInviteWebPage()
     
     if os.environ['REQUEST_METHOD'] == 'GET':
         this_webpage.add_meeting_invite_step_1()
     elif os.environ['REQUEST_METHOD'] == 'POST':
         form = cgi.FieldStorage()
-        logging.info("form type: %s" % type(form))
+        #logging.info("form type: %s" % type(form))
         
         if not form.getvalue('step'):
             this_webpage.set_title("Add Meeting Invite :: Error")

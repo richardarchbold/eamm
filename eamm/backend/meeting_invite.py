@@ -217,6 +217,9 @@ class MeetingInvite(object):
         self.requester = form.getvalue('requester')          # you@example.com string
         self.invitees = form.getvalue('invitees')            # wysiwyg html string    
         
+        # TODO, remove once testing complete.
+        logging.info("Show me the invitee list from form: %s" % self.invitees)
+        
         if not self.__validate():
             self.is_valid = False
             self.error = "Class:MeetingInvite, Method: __load_form, ERROR: Couldn't validate \
@@ -273,8 +276,42 @@ class MeetingInvite(object):
         #else:
         #    logging.info("good duration: %s" % self.duration)
         
-        return self.is_valid
+        ####
+        # validate invitees list, save the good email_addrs in a new list
+        invitee_list = list()
+        lines = self.invitees.split('\n')
+        i=0
+    
+        for line in lines:
+            # get rid of bracketing white spaces and print the line
+            line = line.strip()
+            logging.info("Class:MeetingInvite, Method: __validate, invitees line: %s" % line)
+            
+            # get rid of HTML tags with a non-greedy search and replace.
+            line = re.sub("<.*?>", "", line)
+            logging.info("Class:MeetingInvite, Method: __validate, invitees line stripped %s" % line)
         
+            if re.match('^[\w\-\.]+@[\w\.\-]+\.\w+$', line):
+                # the above is a crude regex for an email address.
+                logging.info("Class:MeetingInvite, Method: __validate, invitees, line is an email address: %s\n\n" % line)
+                invitee_list.append(line)
+            elif re.match('\W+$', line):
+                # it's a pure white space line, so skip it.
+                logging.info("Class:MeetingInvite, Method: __validate, invitees, line is non-word chars, skipping")
+                pass
+            else:
+                # bugs crud
+                logging.info("Class:MeetingInvite, Method: __validate, invitees, line is NOT an email address: %s\n\n" % line)
+                self.error = "Class:MeetingInvite, Method: __validate, invitees, line is NOT an email address: %s\n\n" % line
+                self.is_valid = False
+            i+=1
+        
+        # initialize a new object attribute for the santized invitee email_addr list        
+        self.invitees_list = invitee_list
+        logging.info("emails: %s", tuple(self.invitees_list))
+        
+        return self.is_valid
+
         
 def __cleanup_crud(self):
     # delete any leftover crud from DB, pitty we're not using transactions here :-(

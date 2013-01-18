@@ -9,8 +9,6 @@ class Meeting(object):
     """Summary of class here.
 
     """
-    pass
-    
     def __init__(self):
         """ init
         """

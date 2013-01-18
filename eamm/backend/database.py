@@ -143,7 +143,7 @@ class MyDatabase(object):
             # Rollback in case there is any error
             self.db.rollback()
             self.db.close()
-            self.error = "Class: MyDatabase, Method: insert, Message: %s" % str(e)
+            self.error = "Class: MyDatabase, Method: insert, ERROR: %s" % str(e)
             logging.info(self.error)
             self.is_valid = False
             return False
@@ -152,7 +152,7 @@ class MyDatabase(object):
         self.db.close()
         
         if auto_increment:
-            return id
+            return my_id
     
     def insert2(self, insert_stmt, sql_vars, auto_increment=None):
         logging.info("INSERT2:\n%s" % insert_stmt)
@@ -189,7 +189,7 @@ class MyDatabase(object):
         self.db.close()
         
         if auto_increment:
-            return id
+            return my_id
         else:
             return True
         

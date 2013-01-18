@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>eamm :: $title </title>
+
+		<script type="text/javascript" src="http://127.0.0.1/eamm/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
+        
+        <script type="text/javascript">
+            tinyMCE.init({
+            mode : "textareas"
+            });
+        </script>
+	</head>
+
+	<body>
+		
+		<div align="center">
+
+		<form action="/eamm/eamm/testing/testing_textarea.py" id="addMeeting" method="post">
+		<textarea cols="80" rows="10" id="invitees" name="invitees">Put each invitee email addr on a new line, eg<br>a@a.com<br>b@b.com</textarea>
+		<input type="submit" value="submit" />
+		</form>
+		
+		</div>
+		
+	</body>
+	
+</html>

@@ -386,6 +386,8 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
            
         # presuming that passing a "form" variable to the class will try and create/save
         # a new invite.
+        logging.info("blah: %s" % form.getvalue("invitees"))
+        
         new_invite = eamm.backend.meeting_invite.MeetingInvite(form)
         
         if new_invite.is_valid:
