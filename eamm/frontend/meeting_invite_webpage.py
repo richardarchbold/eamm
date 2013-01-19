@@ -20,9 +20,19 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         
             <script type="text/javascript" src="/eamm/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
             <script type="text/javascript">
+            
                 tinyMCE.init({
-                mode : "textareas"
+                    mode : "textareas",
+                    theme : "advanced",
+                    theme_advanced_buttons1 : "mybutton,bold,italic,underline,separator,strikethrough,justifyleft,justifycenter,justifyright, justifyfull,bullist,numlist,undo,redo,link,unlink",
+                    theme_advanced_buttons2 : "",
+                    theme_advanced_buttons3 : "",
+                    theme_advanced_toolbar_location : "top",
+                    theme_advanced_toolbar_align : "left",
+                    theme_advanced_statusbar_location : "bottom",
+            
                 });
+                
             </script>
             
             """
@@ -43,8 +53,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
           </tr>
 
           <tr>
-            <td colspan="2" class="col2_bottom"><textarea name="purpose" cols="80" rows="3" class="txt_area">
-            The purpose of this meeting is to XXX such that YYY can be achieved</textarea></td>
+            <td colspan="2" class="col2_bottom"><textarea name="purpose" cols="80" rows="3" class="txt_area">The purpose of this meeting is to XXX such that YYY can be achieved</textarea></td>
           </tr>
         
           <tr>
@@ -96,6 +105,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         </table>
 
         </form>
+
         """
       
         self.add_to_body(html)
@@ -173,6 +183,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         </table>
 
         </form>
+
         """
             
         self.add_to_body(html)

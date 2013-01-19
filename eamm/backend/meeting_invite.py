@@ -306,6 +306,12 @@ class MeetingInvite(object):
                 self.is_valid = False
             i+=1
         
+        # if there are no email's then it's false.
+        if len(invitee_list) <= 0:
+            self.is_valid = False
+            self.error = "Class:MeetingInvite, Method: __validate, no valid email addrs for invitees"
+            logging.info(self.error)
+            
         # initialize a new object attribute for the santized invitee email_addr list        
         self.invitees_list = invitee_list
         logging.info("emails: %s", tuple(self.invitees_list))
