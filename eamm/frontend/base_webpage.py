@@ -7,7 +7,7 @@ logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
 class WebPage(object):
       
     def __init__(self):
-        self.css = "css/eamm.css"
+        self.css = "/eamm/css/eamm.css"
         self.title = "EAMM ::"
         self.js = ""
         self.body = ""
@@ -19,7 +19,7 @@ class WebPage(object):
             <div align="center">
             <table>
             <tr>
-                <td class="header"><img src="images/dilbert-meeting.jpg" width="187" height="176"/></td>
+                <td class="header"><img src="/eamm/images/dilbert-meeting.jpg" width="187" height="176"/></td>
                 <td class="header">Efficient Automated Meeting Manager :: %s</td>
             </tr>
             </table>

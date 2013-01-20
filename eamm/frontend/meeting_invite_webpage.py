@@ -35,13 +35,15 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
                 
             </script>
             
+            <script type="text/javascript" src="http://127.0.0.1/eamm/js/eamm.js"></script>
+            
             """
     
     def add_meeting_invite_step_1(self):
         self.set_title("Create a new meeting invite :: Step 1")   
       
         html = """
-        <form name="add_user" method="post" action="/eamm/add_meeting_invite.py"> 
+        <form id="add_meeting_invite" name="add_meeting_invite" method="post" action="/eamm/add_meeting_invite.py"> 
         <input type="hidden" name="step" value="step1" />
         
         <table>
@@ -122,7 +124,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         my_template.get(id_template)
         
         html = """
-        <form name="add_user" method="post" action="/eamm/add_meeting_invite.py"> 
+        <form id="add_meeting_invite" name="add_meeting_invite" method="post" action="/eamm/add_meeting_invite.py"> 
         <input type="hidden" name="step" value="step2" />
         """
         html += self.hide_past_form_contents(form)
@@ -202,8 +204,8 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         my_template.get(id_template)
         
         html = """
-        <form name="add_user" method="post" action="/eamm/add_meeting_invite.py"> 
-        <input type="hidden" name="step" value="step3" />
+        <form name="add_meeting_invite" id="add_meeting_invite" onsubmit="return validateStep3Form()" method="post" action="/eamm/add_meeting_invite.py"> 
+        <input type="hidden" name="step" value="step3" /> 
         """
         
         html += self.hide_past_form_contents(form)
@@ -314,7 +316,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         my_template.get(id_template)
         
         html = """
-        <form name="add_user" method="post" action="/eamm/add_meeting_invite.py"> 
+        <form id="add_meeting_invite" name="add_meeting_invite" method="post" action="/eamm/add_meeting_invite.py"> 
         <input type="hidden" name="step" value="step4" />
         """
         

@@ -6,31 +6,64 @@
 		<title>eamm :: $title </title>
 
 		<script type="text/javascript" src="http://127.0.0.1/eamm/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
-        <script type="text/javascript">
-            tinyMCE.init({
-            mode : "textareas"
-            });
-            
-			
-        </script>
-        
-        <script type="text/javascript" src="http://127.0.0.1/eamm/js/eamm.js"></script>
-        
+
+    <script type="text/javascript">
+      tinyMCE.init({
+        mode : "textareas"
+      });
+    </script>
+
+    <script>
+      function validateForm() {
+
+        // get the invitees area.
+        var inviteesArea=document.forms["addMeeting"]["invitees"].value;
+
+        // create an array of each line, split by <br> tag.
+        var tmpArray = new Array();
+        tmpArray = inviteesArea.split("<br>");
+
+        // iterate the list
+        for (var i = 0; i < tmpArray.length; i++) {
+          // discard remaining HTML tags.
+          tmpArray[i] = tmpArray[i].replace(/<.*>/g,"");
+
+          var tmpForError = tmpArray[i]
+
+          // strip whitespace.
+          tmpArray[i] = tmpArray[i].replace(/ /g,"");
+
+          // check to see if whatever remains looks like an email address
+          // alert to the user and return false if not.
+          var email_regex = /[\w\-\.]+@[\w\.\-]+\.\w+/;
+          if (! email_regex.test(tmpArray[i])) {
+           alert("Line:" + tmpForError + "in the invitees list does not seem like an email address :-(");
+           return false;
+          }
+        }
+
+        return true;
+      }
+    </script>
+
+    <!--
+    <script type="text/javascript" src="http://127.0.0.1/eamm/js/eamm.js"></script>
+    -->
 	</head>
 
 	<body>
-		
+
 		<div align="center">
 
-		<form action="/eamm/eamm/testing/testing_textarea.py" id="addMeeting" method="post" onsubmit="return validateForm()">
+		<form action="/eamm/eamm/testing/testing_textarea.py" id="addMeeting" onsubmit="return validateForm()" method="post">
 			<textarea cols="80" rows="10" id="invitees" name="invitees">
 				Put each invitee email addr on a new line, eg<br>a@a.com<br>b@b.com
 			</textarea>
 			<input type="submit" value="submit" />
 		</form>
-		
+
 		</div>
-	
+
 	</body>
-	
+
 </html>
