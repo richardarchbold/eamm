@@ -30,9 +30,10 @@ function validateInvitees() {
     // get the invitees area.
     var inviteesArea=document.forms["add_meeting_invite"]["invitees"].value;
 
-    // create an array of each line, split by <br> tag.
+    // create an array of each line, unfortunately, it seems that sometimes a
+    // newline is represented by a <br> and sometimes by a '\n'.
     var tmpArray = new Array();
-    tmpArray = inviteesArea.split(/<br.*?>/);
+    tmpArray = inviteesArea.split(/<br.*?>|\n/);
 
     // iterate the list
     for (var i = 0; i < tmpArray.length; i++) {
