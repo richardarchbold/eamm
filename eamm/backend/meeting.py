@@ -31,8 +31,13 @@ class Meeting(object):
         # Specify that this is an insert with an auto-incrementing PK.
         auto_increment = True       
 
-        # open up a connection to the DB
-        my_db_connection = eamm.backend.database.MyDatabase()
+        if self.db_connection:
+            my_db_connection = self.db_connection
+            logging.info("yo")
+        else:
+            # open up a connection to the DB
+            my_db_connection = eamm.backend.database.MyDatabase()
+            logging.info("noo")
         
         # execute the insert, if it worked, the returned value will be the auto-incremented pk value
         # for the fresh insert.

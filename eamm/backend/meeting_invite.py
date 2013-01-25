@@ -14,7 +14,7 @@ class MeetingInvite(object):
     """
     * MeetingInvite(form), create a new MeetingInvite object, initialize values from a form
         * MeetingInvite.__init__(form)
-            * MeetingInvite.__load_form_form(form), sets self.XXX values
+            * MeetingInvite.__load_form(form), sets self.XXX values
                 * MeetingInvite.__validate(), validates self.XXX values.
     
      if MeetingInvite.is_valid:     (is_valid is a bool set by __validate()
@@ -61,36 +61,85 @@ class MeetingInvite(object):
         
         if not self.__already_exists():
             # 1. add to invite tbl
-            # 2. add to meeting tbl
-            # 3. add to participant tbl
-            
-            # 1. add to invite tbl
+            logging.info("start __add_to_invite_tbl")
             self.__add_to_invite_tbl()
+            logging.info("finish __add_to_invite_tbl, is_valid=%s" % self.is_valid)
             # if the __add_to_invite_tbl failed, it will set the is_valid bool to false and stick the
             # error message is self.error
             if self.is_valid == False:
-                return False
+                return
                 
-            # 2. add to meeting tbl, a la Meeting.add() 
+            # 2. add to the invitees tbl
+            logging.info("start __add_to_inviteeeeeee_tbl")
+            self.__add_to_invitee_tbl()
+            logging.info("finish __add_to_inviteeeeeeee_tbl, is_valid=%s" % self.is_valid)
+            if self.is_valid == False:
+                return
+            
+            # 3. add to meeting tbl, a la Meeting.add()
+            # 
+            # if it's a recurring meeting, we'll need to iterate through and add several
+            # meeting instances.
+            # if it's a non-recurring meeting, we only need to add a single meeting instance.
+            #
+            # we re-use the same db_connection for all of these, so we can do a single commit
+            # at the end.
             if (self.recurring == "none"):
                 my_meeting = eamm.backend.meeting.Meeting()
-                my_meeting.add(self.id_invite, self.start_datetime, self.end_datetime, self.requester)
-                # if the add() method failed, it will set the is_valid bool to false and stick the
-                # error message is self.error
-                if my_meeting.is_valid == False:
-                    self.is_valid = False
-                    self.error = my_meeting.error
-                    self.__cleanup_crud(self.id_invite)
-                    return False
+                if self.db_connection:
+                    my_meeting.db_connection = self.db_connection
+                    my_meeting.add(self.id_invite, self.start_datetime, self.end_datetime, self.requester)
                 else:
-                    # we made it, everything added!
-                    return True
+                    self.is_valid = False
+                    self.error = "meeting_invite.add() self.db_connection is dead and can't be passed \
+                    to my_meeting.db_connection"
+                    logging.info(self.error)
+                    return
             else:
-                # we'll deal with recurring meetings later
-                # TODO
+                # TODO: we'll deal with recurring meetings later
                 pass
+                  
+            # if the my_meeting.add() method failed, it will set the is_valid bool to false and stick the
+            # error message is self.error
+            if my_meeting.is_valid == False:
+                self.is_valid = False
+                self.error = my_meeting.error
+                    
+                #roll back all the inserts
+                try:
+                    self.db_connection.db.rollback()
+                except:
+                    raise
+                
+                return
+            else:
+                # we made it, everything added!
+                try:
+                    self.db_connection.db.commit()
+                except:
+                    raise
+                
+                return True
             
+    def __add_to_invitee_tbl(self):
+        # row format:
+        #    idInvite, invitee_email_addr
+        # local attribute = self.invitees_list
+        
+        for this_addr in self.invitees_list:
+            sql = """INSERT INTO Invitee (idInvite, invitee_email_addr) VALUES (%s, %s)"""
+            sql_vars= [self.id_invite, this_addr]
             
+            my_db_connection = self.db_connection
+            my_db_connection.insert2(sql, sql_vars)
+            
+            if self.is_valid == False:
+                self.error = "Class:MeetingInvite, Method: __add_to_invitee_tbl, error"
+                logging.info(self.error)
+                return
+        
+        return True
+                
     def __add_to_invite_tbl(self):
         # row format:
         #   idInvite, start_date, duration, end_date, recurring, invite_status, title, purpose, 
@@ -119,13 +168,17 @@ class MeetingInvite(object):
         # Specify that this is an insert with an auto-incrementing PK.
         auto_increment = True       
 
-        # open up a connection to the DB, check to make sure it worked
-        my_db_connection = eamm.backend.database.MyDatabase()
-        if not my_db_connection:
-            self.is_valid = False
-            self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, ERROR: Couldn't create \
-                          MyDatabase object"
-            return False
+        # check to see if db_connection is set
+        if self.db_connection:
+            my_db_connection = self.db_connection
+        else:
+            # open up a connection to the DB, check to make sure it worked
+            my_db_connection = eamm.backend.database.MyDatabase()
+            if not my_db_connection:
+                self.is_valid = False
+                self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, ERROR: Couldn't create \
+                              MyDatabase object"
+                return False
                 
         # execute the insert2, if it worked, the returned value will be the auto-incremented 
         # PK value for the fresh insert

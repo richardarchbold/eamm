@@ -33,7 +33,7 @@ class MyDatabase(object):
     for details on how this package works. 
     """ 
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         """Constructor, main function is to initialize the DB connection.
         """
         db_host = "localhost"
@@ -43,6 +43,12 @@ class MyDatabase(object):
         
         self.is_valid = True
         self.error = None
+        self.autocommit = True
+        
+        if kwargs.get('autocommit') == 'off':
+            self.autocommit = False
+        
+        logging.info("autocommit = %s" % self.autocommit)
         
         try:
             self.db = MySQLdb.connect (host = db_host, 
@@ -78,8 +84,10 @@ class MyDatabase(object):
             return False
         
         logging.info("SELECT: returned %s rows" % len(rows))
-        cursor.close()
-        self.db.close()
+        
+        if self.autocommit == True:
+            cursor.close()
+            self.db.close()
         return rows
     
     def select2(self, select_stmt, sql_vars=None):
@@ -115,8 +123,11 @@ class MyDatabase(object):
             
         rows = cursor.fetchall()
         logging.info("SELECT2: returned %s rows" % len(rows)) 
-        cursor.close()
-        self.db.close()
+        
+        if self.autocommit == True:
+            cursor.close()
+            self.db.close()
+       
         return rows
     
     def insert(self, insert_stmt, auto_increment=None):
@@ -132,13 +143,11 @@ class MyDatabase(object):
             # Execute the SQL command
             cursor = self.db.cursor()
             cursor.execute(insert_stmt)
-            # Commit your changes in the database
-            self.db.commit()
-            if auto_increment:
-                cursor.execute("SELECT LAST_INSERT_ID()")
-                row = cursor.fetchone()
-                my_id = row[0]
-                logging.info("INSERT last auto_increment value: %s" % my_id)
+            
+            # Commit your changes in the database, if in autocommit mode.
+            if self.autocommit:
+                self.db.commit()
+                
         except Exception as e:
             # Rollback in case there is any error
             self.db.rollback()
@@ -147,37 +156,54 @@ class MyDatabase(object):
             logging.info(self.error)
             self.is_valid = False
             return False
-
-        # disconnect from server
-        self.db.close()
+        
+        if auto_increment:
+            cursor.execute("SELECT LAST_INSERT_ID()")
+            row = cursor.fetchone()
+            my_id = row[0]
+            logging.info("INSERT last auto_increment value: %s" % my_id)
+            
+        # disconnect from server if in autocommit
+        if self.autocommit:
+            self.db.close()
         
         if auto_increment:
             return my_id
     
     def insert2(self, insert_stmt, sql_vars, auto_increment=None):
-        logging.info("INSERT2:\n%s" % insert_stmt)
+        logging.info("INSERT2(autocommit=%s):\n%s" % (self.autocommit, insert_stmt))
         
         if type(sql_vars) is list:
             logging.info("INSERT2: *was* passed a list of variables for substitution")
+            
+            # log each of the SQL vars passed.
             count=0;
             while count < len(sql_vars):
                 logging.info("sql_vars[%s] = %s" % (count, sql_vars[count]))
                 count+=1
+                
+            # try an insert, only commit if we're in autocommit mode.
+            # throw an exception if the insert failed.
             try:
                 cursor = self.db.cursor()
                 cursor.execute(insert_stmt, tuple(sql_vars))  
-                self.db.commit()
-                if auto_increment:
-                    cursor.execute("SELECT LAST_INSERT_ID()")
-                    row = cursor.fetchone()
-                    my_id = row[0]
-                    logging.info("INSERT last auto_increment value: %s" % my_id)
+                
+                if self.autocommit:
+                    self.db.commit()
+            
             except Exception as e:
                 self.db.close()
                 self.error = "Class: MyDatabase, Method: insert2, Message: %s" % str(e)
                 logging.info(self.error)
                 self.is_valid = False
                 return False
+            
+            # if autoincrementing, try to get the last insert id to send back.
+            if auto_increment:
+                cursor.execute("SELECT LAST_INSERT_ID()")
+                row = cursor.fetchone()
+                my_id = row[0]
+                logging.info("INSERT last auto_increment value: %s" % my_id)
         else:
             self.error = "Class: MyDatabase, Method: insert2, Message: INSERT2 was \
             passed a sql_vars arg that was not a list (%s)" % type(sql_vars)
@@ -185,8 +211,9 @@ class MyDatabase(object):
             self.is_valid = False
             return False
                 
-        # disconnect from server
-        self.db.close()
+        # disconnect from server, only if we ARE in autoincrement mode.
+        if self.autocommit:
+            self.db.close()
         
         if auto_increment:
             return my_id
@@ -200,7 +227,8 @@ class MyDatabase(object):
             cursor = self.db.cursor()
             cursor.execute(delete_stmt)
             # Commit your changes in the database
-            self.db.commit()
+            if self.autocommit:
+                self.db.commit()
         except Exception as e:
             # Rollback in case there is any error
             self.db.rollback()

@@ -3,6 +3,7 @@
 import eamm.frontend.base_webpage 
 import eamm.backend.meeting_template
 import eamm.backend.meeting_invite
+import eamm.backend.database
 
 # Import modules for CGI handling , the cgitb modules gives descriptive debug errors to the browser.
 import cgitb; cgitb.enable(display=1)
@@ -404,6 +405,10 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         new_invite = eamm.backend.meeting_invite.MeetingInvite(form)
         
         if new_invite.is_valid:
+            # create a new DB connection instance, with autocommit off.
+            db_transaction_con = eamm.backend.database.MyDatabase(autocommit="off")
+            # reach in and set a new DB attribute.
+            new_invite.db_connection = db_transaction_con 
             if new_invite.add():
                 html = """
         
