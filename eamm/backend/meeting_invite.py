@@ -27,19 +27,59 @@ class MeetingInvite(object):
     def __init__(self, arg1=None):    
         # by default, a new object is True, self.__validate() will update the status.
         self.is_valid = True
-        self.error = False
+        self.error = None
         
         if arg1 == None:
             # no arguments passed
             pass
-        elif type(arg1) is int:
-            # arg1 is an int, likely an existing id_meeting_invite
-            pass
+        elif isinstance(arg1, (int, long)):
+            # id_invite is an int, likely an existing id_meeting_invite
+            # 1. craft the SQL, be explict
+            # 2. execute the query
+            # 3. check the rows returned, should be one.
+            #    if 1 row returned:
+            #        populate the right vales are return.
+            #    else:
+            #        log the error, set the flags
+            #        return False
+            sql = """
+            SELECT idInvite, start_date, duration, end_date, recurring, invite_status, 
+                   title, purpose, background_reading, agenda, requester_email_addr, 
+                   venue, idMeetingTemplate
+            FROM Invite
+            Where idInvite=%s
+            """
+            sql_vars = [arg1]
+            my_db_conn = eamm.backend.database.MyDatabase()
+            my_query_results = my_db_conn.select2(sql, sql_vars)
+            
+            if not my_query_results:
+                self.is_valid = False
+                self.error = my_db_conn.error
+                logging.info("db connection failed")
+            elif len(my_query_results) == 0:
+                self.is_valid = False
+                self.error = "id_invite %s does not exist"
+                logging.info(self.error)
+            else:
+                # looks like were good.
+                self.id_invite = my_query_results[0][0]
+                self.start_date = my_query_results[0][1]
+                self.duration = my_query_results[0][2]
+                self.end_date = my_query_results[0][3]
+                self.recurring = my_query_results[0][4]
+                self.invite_status = my_query_results[0][5]
+                self.title = my_query_results[0][6]
+                self.purpose = my_query_results[0][7]
+                self.background_reading = my_query_results[0][8]
+                self.agenda = my_query_results[0][9]
+                self.requester = my_query_results[0][10]
+                self.venue = my_query_results[0][11]
+                self.id_template = my_query_results[0][12]
         elif arg1.getvalue('purpose'):
             # arg1 is a form object instance.
             #logging.info("MeetingTemplate() was passed a form as an object")
             form = arg1
-            
             # error back to the calling class if we can't load the form.
             self.__load_form(form)
             
