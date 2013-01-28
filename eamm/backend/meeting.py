@@ -9,12 +9,50 @@ class Meeting(object):
     """Summary of class here.
 
     """
-    def __init__(self):
+    def __init__(self, id_meeting=None):
         """ init
         """
-        self.id_Meeting = False
         self.is_valid = True
         self.error = None
+    
+        if (isinstance(id_meeting, (int, long))):
+            # we were passed a meeting invite to load
+            #
+            # 1. craft the SQL, be explict
+            # 2. execute the query
+            # 3. check the rows returned, should be one.
+            #    if 1 row returned:
+            #        populate the right vales are return.
+            #    else:
+            #        log the error, set the flags
+            #        return False
+            sql = """
+            SELECT idMeeting, idInvite, meeting_status, start_time, end_time, meeting_chair,
+                   meeting_minute_notes
+            FROM EAMM.Meeting
+            WHERE idMeeting=%s
+            """
+            sql_vars = [id_meeting]
+            my_db_conn = eamm.backend.database.MyDatabase()
+            my_query_results = my_db_conn.select2(sql, sql_vars)
+            
+            if not my_query_results:
+                self.is_valid = False
+                self.error = my_db_conn.error
+                logging.info("aaa")
+            elif len(my_query_results) == 0:
+                self.is_valid = False
+                self.error = "id_meeting %s does not exist"
+                logging.info(self.error)
+            else:
+                self.id_meeting = id_meeting
+                self.id_invite = my_query_results[0][1]
+                self.meeting_status = my_query_results[0][2]
+                self.start_datetime = my_query_results[0][3]
+                self.end_datetime = my_query_results[0][4]
+                self.meeting_chair = my_query_results[0][5]
+                self.meeting_minutes_notes = my_query_results[0][6]
+        
     
     def add(self, id_invite, start_datetime, end_datetime, meeting_chair):
         self.id_invite = id_invite

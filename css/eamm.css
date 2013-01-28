@@ -38,6 +38,12 @@ table {
 	font-weight: bold;
 }
 
+.aqua {
+    background-color: #00b8ff;
+    font-weight: bold;
+    text-align: center;
+}
+
 .col2_top {
 	background-color: #99ccff;
 }
