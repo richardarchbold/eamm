@@ -45,7 +45,7 @@ class MeetingInvite(object):
             sql = """
             SELECT idInvite, start_date, duration, end_date, recurring, invite_status, 
                    title, purpose, background_reading, agenda, requester_email_addr, 
-                   venue, idMeetingTemplate
+                   venue, idMeetingTemplate, justification
             FROM Invite
             Where idInvite=%s
             """
@@ -76,6 +76,9 @@ class MeetingInvite(object):
                 self.requester = my_query_results[0][10]
                 self.venue = my_query_results[0][11]
                 self.id_template = my_query_results[0][12]
+                self.justification = my_query_results[0][13]
+                self.invitees_list = self.__get_invitees()
+                
         elif arg1.getvalue('purpose'):
             # arg1 is a form object instance.
             #logging.info("MeetingTemplate() was passed a form as an object")
@@ -198,12 +201,12 @@ class MeetingInvite(object):
         sql = """
         INSERT into Invite (start_date, duration, end_date, recurring, invite_status, title, 
                             purpose, background_reading, agenda, requester_email_addr, venue, 
-                            idMeetingTemplate) 
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            idMeetingTemplate, justification) 
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """ 
         sql_vars= [self.start_datetime, self.duration, self.end_datetime, self.recurring, "ACTIVE", 
                    self.title, self.purpose, "NONE", self.agenda, self.requester, self.venue,
-                   self.id_template]
+                   self.id_template, self.justification]
         
         # Specify that this is an insert with an auto-incrementing PK.
         auto_increment = True       
@@ -283,7 +286,7 @@ class MeetingInvite(object):
 
     
     def __load_form(self, form):
-    # initialize all key class attributes from form data.            
+        # initialize all key class attributes from form data.            
         # check to make sure all fields have stuff in them.
         if not all((form.getvalue('purpose'), form.getvalue('justification'), 
                     form.getvalue('template'), form.getvalue('agenda'), 
@@ -412,15 +415,31 @@ class MeetingInvite(object):
         return self.is_valid
 
         
-def __cleanup_crud(self):
-    # delete any leftover crud from DB, pitty we're not using transactions here :-(
-    sql = """
-    DELETE FROM Invite WHERE idInvite='%s' LIMIT 1
-    """
+    def __get_invitees(self):
+        sql = """
+        SELECT invitee_email_addr 
+        FROM Invitee 
+        WHERE idInvite=%s 
+        ORDER BY invitee_email_addr
+        """
+        sql_vars = [self.id_invite]
     
-    # open up a connection to the DB
-    my_db_connection = eamm.backend.database.MyDatabase()
+        my_db_conn = eamm.backend.database.MyDatabase()
+        my_query_results = my_db_conn.select2(sql, sql_vars)
+            
+        if not my_query_results:
+            self.is_valid = False
+            self.error = my_db_conn.error
+            logging.info("__get_invitees: db connection failed")
+        elif len(my_query_results) == 0:
+            self.is_valid = False
+            self.error = "id_invite %s does not exist"
+            logging.info(self.error)
+        else:
+            # looks like were good.
+            invitees_list = list()
+            for item in my_query_results:
+                invitees_list.append(item[0])
         
-    # execute the cleanup delete stmt.
-    logging.info("Cleaning up and deleting Meeting Invite \"%s\" from the Invite tbl" % self.id_invite)
-    my_db_connection.delete(sql)
+        #invitees_list = ['a@a.com', 'b@b.com']    
+        return invitees_list    

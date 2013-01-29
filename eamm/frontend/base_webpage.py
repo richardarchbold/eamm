@@ -9,7 +9,9 @@ class WebPage(object):
     def __init__(self):
         self.css = "/eamm/css/eamm.css"
         self.title = "EAMM ::"
-        self.js = ""
+        self.js = """
+        <script type="text/javascript" src="http://127.0.0.1/eamm/js/eamm.js"></script>
+        """
         self.body = ""
         
     def set_title(self, title):

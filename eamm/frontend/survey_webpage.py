@@ -1,8 +1,11 @@
 # import necessary eamm modules.
 import eamm.frontend.base_webpage 
 import eamm.backend.survey
+import eamm.backend.meeting
+import eamm.backend.meeting_invite
 
 # Import modules for CGI handling , the cgitb modules gives descriptive debug errors to the browser.
+import cgi
 import cgitb; cgitb.enable(display=1)
 
 # Import these for query string parsing.
@@ -55,13 +58,13 @@ class SurveyWebpage(eamm.frontend.base_webpage.WebPage):
         
         # need to write a method to load a meeting invite object if it's passed an id_invite
         # on instantiation (partially stubbed out at the __init__ level
-        self.invite_obj = eamm.backend.meeting_invite(self.meeting_obj.id_invite)
+        self.invite_obj = eamm.backend.meeting_invite.MeetingInvite(self.meeting_obj.id_invite)
         if not self.invite_obj.is_valid:
             self.error_table(self.invite_obj.error)
             return
         
         # need to write the function to get_questions based on id_template.
-        self.survey_questions = eamm.backend.survey.get_questions(self.id_template)
+        self.survey_questions = eamm.backend.survey.get_questions(self.invite_obj.id_template)
         if not self.survey_questions:
             self.error_table("could not get survey questions for %s" % self.id_template)
             return
@@ -71,8 +74,118 @@ class SurveyWebpage(eamm.frontend.base_webpage.WebPage):
         
     def __show_survey(self):
         # this just prints out the HTML
-        pass
+        self.set_title("Meeting Effectiveness Survey")
         
+        self.js = """
+        <script type="text/javascript" src="http://127.0.0.1/eamm/js/eamm.js"></script>
+        """
+        
+        html = """
+        
+          <form action="/eamm/complete_survey.py" id="survey" method="post">
+          <input type="hidden" name="id_invite" value="%s" />
+          <input type="hidden" name="id_meeting" value="%s" />
+          <input type="hidden" name="email_addr" value="%s" />
+          <table>
+          
+            <TR>
+              <TD rowspan="6" class="col1">For which meeting?</TD>
+              <TD class="sub_col_1">Date & Time</TD>
+              <TD>%s</TD>
+            </TR>
+            
+            <TR>
+              <TD class="sub_col_1">Subject</TD>
+              <TD>%s</TD>
+            </TR>
+            
+            <TR>
+              <TD class="sub_col_1">Purpose</TD>
+              <TD>%s</TD>
+            </TR>
+
+            <TR>
+              <td class="sub_col_1">Justification</td>
+              <td>%s</td>
+            </TR>
+
+            <TR>
+              <td class="sub_col_1">Agenda</td>
+              <td>%s</td>
+            </TR>
+        """ % (self.invite_obj.id_invite, self.meeting_obj.id_meeting, self.email_addr, 
+               self.meeting_obj.start_datetime, self.invite_obj.title, self.invite_obj.purpose, 
+               self.invite_obj.justification, self.invite_obj.agenda)
+        
+        html += """
+            <TR>
+              <td class="sub_col_1">Invitees</td>
+              <td>%s</td>
+            </TR> 
+        """ % " ".join(self.invite_obj.invitees_list)
+        
+        html += """
+            <TR>
+              <TD colspan="3" class="aqua">To what extent do you agree or disagree with the following
+              questions?</TD>
+            </TR>
+        """
+    
+        html += """
+        <!-- beginning HTML block for a single question -->
+            <TR>
+              <TD rowspan="2" class="col1">Question 1</td>
+              <td colspan="2" class="col2_top">If your email address is different from the one 
+              listed in the invitees box above, please enter it below. THis is used for de-duplication
+              purposes and all survey data is anonymized before being displayed</td>
+            </tr>
+            
+            <tr>
+              <td colspan="2" class="col2_bottom">
+              <div align="center">
+              <input type="text" name="responder_email_addr" value="" size="55"/>
+              </div>
+              </td>
+            </tr>
+            <!-- ending HTML block for a single question -->
+            """
+        count = 0
+        for row in self.survey_questions:
+            # tmpArray[i] = tmpArray[i].replace(/<.*>/g,"");
+            temp = re.sub("John Doe", self.invite_obj.requester, row[1])
+            html_question = """
+            <!-- beginning HTML block for a single question -->
+            <TR>
+              <TD rowspan="2" class="col1">Question %s</td>
+              <td colspan="2" class="col2_top">%s</td>
+            </tr>
+            
+            <tr>
+              <td colspan="2" class="col2_bottom">
+                <input type="radio" name="%s" value="0">Strongly Disagree
+                <input type="radio" name="%s" value="25">Disagree
+                <input type="radio" name="%s" value="50">Neutral
+                <input type="radio" name="%s" value="75">Agree
+                <input type="radio" name="%s" value="100">Strongly Agree
+              </td>
+            </tr>
+            <!-- ending HTML block for a single question -->
+            """ % (count+2, temp, row[0], row[0], row[0], row[0], row[0])
+            
+            count += 1
+            html += html_question
+        
+        html += """
+            <tr>
+              <td colspan="3" class="header"><input type="submit" value="Submit"/></td>
+            </tr>
+          </table>
+          </form>
+        
+        """
+        
+        self.add_to_body(html)
+
         
     def parse_query_string(self):
         # write some code to populate self.id_meeting and self.email_addr
@@ -106,5 +219,21 @@ class SurveyWebpage(eamm.frontend.base_webpage.WebPage):
     
         return True
     
+    
     def process_survey(self):
-        pass
+        self.set_title("THANK YOU, the survey is complete!")
+        form = cgi.FieldStorage()
+        
+        for i in form.keys():
+            logging.info("survey key: %s, value: %s<br>\n" % (i, form.getvalue(i)))
+            self.add_to_body("survey key: %s, value: %s<br>\n" % (i, form.getvalue(i)))
+        
+        my_survey = eamm.backend.survey.SurveyResponse(form)
+        if my_survey.add():
+            self.add_to_body("Thanks, Survey Stored Successfully")
+        else:
+            self.add_to_body(self.error_table("Unfortunately, the Survey could not be stored"))
+            
+        return
+        
+        

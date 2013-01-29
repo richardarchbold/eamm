@@ -17,7 +17,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
 
     def __init__(self):
         super(MeetingInviteWebPage, self).__init__()
-        self.js = """
+        self.tinymce_js = """
         
             <script type="text/javascript" src="/eamm/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
             <script type="text/javascript">
@@ -35,8 +35,6 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
                 });
                 
             </script>
-            
-            <script type="text/javascript" src="http://127.0.0.1/eamm/js/eamm.js"></script>
             
             """
     
@@ -56,7 +54,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
           </tr>
 
           <tr>
-            <td colspan="2" class="col2_bottom"><textarea name="purpose" cols="80" rows="3" class="txt_area">The purpose of this meeting is to XXX such that YYY can be achieved</textarea></td>
+            <td colspan="2" class="col2_bottom"><textarea id="purpose" name="purpose" cols="80" rows="3" class="txt_area">The purpose of this meeting is to XXX such that YYY can be achieved.</textarea></td>
           </tr>
         
           <tr>
@@ -66,7 +64,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
           </tr>
 
           <tr>
-            <td colspan="2" class="col2_bottom"><textarea name="justification" cols="80" rows="3" class="txt_area">$justification</textarea></td>
+            <td colspan="2" class="col2_bottom"><textarea id="justification" name="justification" cols="80" rows="3" class="txt_area">A meeting is the best way to achieve my purpose because ...</textarea></td>
           </tr>
         
         """
@@ -116,6 +114,8 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
 
     def add_meeting_invite_step_2(self, form):
         self.set_title("Create a new meeting invite :: Step 2")
+        
+        self.js += self.tinymce_js
         
         purpose = form.getvalue('purpose')
         justification = form.getvalue('justification')
@@ -194,6 +194,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         
     def add_meeting_invite_step_3(self, form):
         self.set_title("Create a new meeting invite :: Step 3")
+        self.js += self.tinymce_js
         
         purpose = form.getvalue('purpose')
         justification = form.getvalue('justification')
@@ -239,17 +240,17 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
           <tr>
             <td rowspan="7" class="col1">Logistics</td>
             <td class="sub_col_1">Start Date</td>
-            <td class="sub_col_2" colspan="3"><input type="text" name="start_date" value="yyyy-mm-dd"/></td>
+            <td class="sub_col_2" colspan="3"><input type="text" id="start_date" name="start_date" value="yyyy-mm-dd"/></td>
           </tr>
         
           <tr>
             <td class="sub_col_1">Start Time (24 hr format)</td>
-            <td class="sub_col_2" colspan="3"><input type="text" name="start_time" value="hh:mm"/></td>
+            <td class="sub_col_2" colspan="3"><input type="text" id="start_time" name="start_time" value="hh:mm"/></td>
           </tr>
           
           <tr>
             <td class="sub_col_1">Duration</td>
-            <td class="sub_col_2" colspan="3"><input type="text" name="duration" value="mm"/></td>
+            <td class="sub_col_2" colspan="3"><input type="text" id="duration" name="duration" value="mm"/></td>
           </tr>
                    
           <tr>
@@ -264,7 +265,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
               </select>
             </td>
             <td class="sub_col_1">End Date</td>
-            <td class="sub_col_2"><input type="text" name="end_date" value="yyyy-mm-dd"/></td>
+            <td class="sub_col_2"><input type="text" id="end_date" name="end_date" value="yyyy-mm-dd"/></td>
           </tr>
 
           <tr>
@@ -274,7 +275,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
                     
           <tr>
             <td class="sub_col_1">Requester</td>
-            <td class="sub_col_2" colspan="3"><input type="text" name="requester" value="you@example.com" size="50"/></td>
+            <td class="sub_col_2" colspan="3"><input type="text" id="requester" name="requester" value="you@example.com" size="50"/></td>
           </tr>
                         
           <tr>
