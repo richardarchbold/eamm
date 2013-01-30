@@ -59,26 +59,7 @@ class SurveyResponse(object):
             # 1. craft the SQL, be explict
             # 2. execute the query
             # 3. check the rows returned, should be more than 1.
-            
-            sql = """
-            """
-            sql_vars = [arg1]
-            my_db_conn = eamm.backend.database.MyDatabase()
-            my_query_results = my_db_conn.select2(sql, sql_vars)
-            
-            if not my_query_results:
-                self.is_valid = False
-                self.error = my_db_conn.error
-                logging.info("db connection failed")
-            elif len(my_query_results) == 0:
-                self.is_valid = False
-                self.error = "id_survey_response %s does not exist"
-                logging.info(self.error)
-            else:
-                # looks like were good.
-                # better populate the data structure.
-                pass
-            
+            pass
         elif arg1.getvalue('id_invite'):
             # arg1 is a form object instance, we know this because id_invite is 
             # one of the hidden form vals always passed through.
@@ -106,10 +87,20 @@ class SurveyResponse(object):
             
             self.q_and_a = dict()
             for i in form.keys():
-                if (isinstance(i, (int,long)) and 
-                    isinstance(form.getvalue(i), (int,long))):
-                    # looks like we have a q&a pair.
-                    self.q_and_a[i]=form.getvalue(i)
+                logging.info("iiii: %s" % type(i))
+                try:
+                    logging.info("@im trying")
+                    j = int(i)
+                    k = int(form.getvalue(i))
+                    logging.info("iiii is now %s %s" % (type(i), i))
+                    if (isinstance(j, (int,long)) and 
+                        isinstance(k, (int,long))):
+                        # looks like we have a q&a pair.
+                        self.q_and_a[j]=k
+                        logging.info("j=%s, form.getvalue(i)=%s" %(j, form.getvalue(i)))                       
+                except:
+                    logging.info("booh %s, %s" % (type(i), i))
+                    pass
     
         
     def __validate(self):
@@ -122,13 +113,14 @@ class SurveyResponse(object):
         # if no duplicate found.
         try:
             self.__already_exists()
-        except Exception as e:
-            raise str(e)
+        except:
+            raise
         
         try:
             self.__add_to_survey_tbl()
-        except:
-            raise
+        except Exception as e:
+            logging.info("failed to add_to_survey_tbl: %s" % str(e))
+            return False
         
         return True
 
@@ -143,12 +135,20 @@ class SurveyResponse(object):
         # setup db connection for transaction
         db_conn_trans = eamm.backend.database.MyDatabase(autocommit="off") 
         
-        for i in self.q_and_a:
-            sql_vars = [self.id_meeting, i, self.responder_email_addr, 
-                        self.invitee_email_addr, self.q_and_a[i]]
-            
+        logging.info("before for")
+        logging.info(type(self.q_and_a))
+        logging.info(self.q_and_a)
+        
+        for key in self.q_and_a:
+            logging.info("insider for")
+            sql_vars = [self.id_meeting, key, self.responder_email_addr, 
+                        self.invitee_email_addr, self.q_and_a[key]]
+            logging.info("test ehre")
             if not db_conn_trans.insert2(sql, sql_vars):
+                logging.info("insert ok")
                 raise Exception("sql insert %s failed: %s" % (sql, db_conn_trans.error))
+            else:
+                logging.info("insert ok")
 
         try:
             db_conn_trans.db.commit()
@@ -160,7 +160,7 @@ class SurveyResponse(object):
         SELECT COUNT(*)
         FROM EAMM.Survey
         WHERE idMeeting=%s and
-              responser_email_addr=%s         
+              responder_email_addr=%s         
         """
         sql_vars = [self.id_meeting, self.responder_email_addr]
 
@@ -177,6 +177,8 @@ class SurveyResponse(object):
             # looks like we got an answer.
             if my_query_results[0][0] == 0:
                 # we have no duplicates
+                logging.info("ok, no duplicates")
                 return
             else:
+                logging.info("aaa")
                 raise Exception("dubplicate entry found")

@@ -61,7 +61,6 @@ class MyDatabase(object):
             self.is_valid = False
         
         
-
     def select(self, select_stmt):
         """Execute a select statement against the DB.
 

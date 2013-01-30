@@ -226,13 +226,15 @@ class SurveyWebpage(eamm.frontend.base_webpage.WebPage):
         
         for i in form.keys():
             logging.info("survey key: %s, value: %s<br>\n" % (i, form.getvalue(i)))
-            self.add_to_body("survey key: %s, value: %s<br>\n" % (i, form.getvalue(i)))
+            #self.add_to_body("survey key: %s, value: %s<br>\n" % (i, form.getvalue(i)))
         
         my_survey = eamm.backend.survey.SurveyResponse(form)
-        if my_survey.add():
-            self.add_to_body("Thanks, Survey Stored Successfully")
-        else:
-            self.add_to_body(self.error_table("Unfortunately, the Survey could not be stored"))
+        try:
+            my_survey.add()
+            self.add_to_body(self.simple_table("Thanks, Survey Stored Successfully"))
+        except Exception as e:
+            self.add_to_body(self.error_table("Unfortunately, the Survey could not be stored: %s")
+                             % str(e))
             
         return
         
