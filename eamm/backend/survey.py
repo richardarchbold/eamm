@@ -83,20 +83,15 @@ class SurveyResponse(object):
             # arg1 is a form object instance, we know this because id_invite is 
             # one of the hidden form vals always passed through.
             form = arg1
+            
             # error back to the calling class if we can't load the form.
             try:
                 self.__load_form(form)
             except:
                 raise
             
-            try:
-                self.__validate()
-            except:
-                raise
-           
             
     def __load_form(self, form):
-        
         if not all((form.getvalue('id_invite'), form.getvalue('id_meeting'),
                     form.getvalue('email_addr'), form.getvalue('responder_email_addr'))):
             self.error = "Class:SurveyResponse, Method: __load_form, Error: Not all form \
@@ -115,21 +110,73 @@ class SurveyResponse(object):
                     isinstance(form.getvalue(i), (int,long))):
                     # looks like we have a q&a pair.
                     self.q_and_a[i]=form.getvalue(i)
+    
         
     def __validate(self):
+        # we are going to refactor __validate to be in eamm.frontend.webpage
         pass
     
     
     def add(self):
+        # error back if something already exits, the below method returns OK
+        # if no duplicate found.
+        try:
+            self.__already_exists()
+        except Exception as e:
+            raise str(e)
+        
+        try:
+            self.__add_to_survey_tbl()
+        except:
+            raise
+        
         return True
-    
+
+
+    def __add_to_survey_tbl(self):
+        sql = """
+        INSERT INTO EAMM.Survey (idMeeting, idSurveyQuestion, responder_email_addr, 
+                                 invitee_email_addr, survey_response_rating)
+        VALUES (%s, %s, %s, %s, %s)
+        """
+        
+        # setup db connection for transaction
+        db_conn_trans = eamm.backend.database.MyDatabase(autocommit="off") 
+        
+        for i in self.q_and_a:
+            sql_vars = [self.id_meeting, i, self.responder_email_addr, 
+                        self.invitee_email_addr, self.q_and_a[i]]
+            
+            if not db_conn_trans.insert2(sql, sql_vars):
+                raise Exception("sql insert %s failed: %s" % (sql, db_conn_trans.error))
+
+        try:
+            db_conn_trans.db.commit()
+        except:
+            raise
     
     def __already_exists(self):
-        pass
-    
-    
-    def __add_to_survey_tbl(self):
-        pass
-    
-    
+        sql = """
+        SELECT COUNT(*)
+        FROM EAMM.Survey
+        WHERE idMeeting=%s and
+              responser_email_addr=%s         
+        """
+        sql_vars = [self.id_meeting, self.responder_email_addr]
+
+        db_conn = eamm.backend.database.MyDatabase()
+        my_query_results = db_conn.select2(sql, sql_vars)
         
+        if not my_query_results:
+            logging.info(db_conn.error)
+            raise Exception(db_conn.error)
+        elif len(my_query_results) == 0:
+            logging.info("bad sql, not exist")
+            raise Exception("bad sql")
+        elif len(my_query_results) == 1:
+            # looks like we got an answer.
+            if my_query_results[0][0] == 0:
+                # we have no duplicates
+                return
+            else:
+                raise Exception("dubplicate entry found")
