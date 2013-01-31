@@ -64,7 +64,28 @@ function validateInvitees() {
     return true;
 }
 
+// set the onchange function for the recurring form.
+function setEndDateStatus () {
+    //document.forms['5'].amount.value
+    var current = document.forms['add_meeting_invite'].recurring.value
+
+    if (current != "none") {
+        document.getElementById("end_date").disabled = false;
+    }
+
+    if (current == "none") {
+        document.getElementById("end_date").disabled = true;
+    }
+}
+
 window.onload = function() {
+
+    // the recurring field should always be disabled oninitial load as it's set to NONE.
+    if (document.getElementById("recurring")) {
+        if (document.getElementById("recurring").value == "none")
+        document.getElementById("end_date").disabled = true;
+    }
+
     // set onfocus and onblur events for anything that we care about.
 
     //purpose textarea

@@ -256,7 +256,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
           <tr>
             <td class="sub_col_1">Repeats</td>
             <td class="sub_col_2">
-              <select name="recurring">
+              <select name="recurring" id="recurring" onChange="setEndDateStatus()">
                 <option value="none">none</option>
                 <option value="daily">daily</option>
                 <option value="weekly">weekly</option>
