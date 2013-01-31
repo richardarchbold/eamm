@@ -6,7 +6,7 @@ import eamm.backend.meeting
 class TestBackendMeeting(unittest.TestCase):
 
     def testInit1(self):
-        test_id_meeting = 24
+        test_id_meeting = 1
         my_meeting = eamm.backend.meeting.Meeting(test_id_meeting)
         self.assertTrue(my_meeting.is_valid and (my_meeting.id_invite == 1))
         

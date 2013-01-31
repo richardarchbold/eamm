@@ -1,11 +1,12 @@
 import eamm.backend.survey
+import eamm.backend.database
 import unittest
 
-class TestBackendInvite(unittest.TestCase):
+class TestBackendSurvey(unittest.TestCase):
 
     def setUp(self):
         db_conn = eamm.backend.database.MyDatabase()
-        sql = """delete from EAMM.Survey where idMeeting=24 and 
+        sql = """delete from EAMM.Survey where idMeeting=1 and 
                  invitee_email_addr='rich@rich.com' and
                  responder_email_addr='crap@crap.com'
         """
@@ -30,8 +31,8 @@ class TestBackendInvite(unittest.TestCase):
         error_msg = ""
         
         # rather than loading the test data from a form, we specify it directly.
-        my_survey.id_invite = 3
-        my_survey.id_meeting = 24
+        my_survey.id_invite = 2
+        my_survey.id_meeting = 1
         my_survey.invitee_email_addr = "rich@rich.com"
         my_survey.responder_email_addr = "crap@crap.com"
         my_survey.q_and_a = dict()

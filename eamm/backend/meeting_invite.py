@@ -1,6 +1,7 @@
 import logging
 import eamm.backend.database
 import eamm.backend.meeting
+from datetime import datetime, timedelta
 
 # Import modules for CGI handling , the cgitb modules gives descriptive debug errors to the browser.
 import cgitb; cgitb.enable(display=1)
@@ -100,7 +101,25 @@ class MeetingInvite(object):
         
         # MySQL retrieves and displays DATETIME values in 'YYYY-MM-DD HH:MM:SS' format. 
         self.start_datetime = self.start_date + " " + self.start_time + ":00"
-        self.end_datetime = self.end_date + " " + self.start_time + ":00"
+        
+        st = re.search('^(\d{2}):(\d{2})$', self.start_time)
+        hh   = int(st.group(1))
+        mm   = int(st.group(2)) 
+        
+        if self.end_date:
+            # end_date:(start_time + duration) 
+            ed = re.search('^(\d{4})-(\d{2})-(\d{2})$', self.end_date)
+            YYYY = int(ed.group(1))
+            MM   = int(ed.group(2))
+            DD   = int(ed.group(3))
+            self.end_datetime = datetime(YYYY, MM, DD, hh, mm) + timedelta(minutes=int(self.duration))
+        else:
+            # start_date:(start_time + duration)
+            sd = re.search('^(\d{4})-(\d{2})-(\d{2})$', self.start_date)
+            YYYY = int(sd.group(1))
+            MM   = int(sd.group(2))
+            DD   = int(sd.group(3))
+            self.end_datetime = datetime(YYYY, MM, DD, hh, mm) + timedelta(minutes=int(self.duration))
         
         if not self.__already_exists():
             # 1. add to invite tbl
@@ -292,7 +311,7 @@ class MeetingInvite(object):
                     form.getvalue('template'), form.getvalue('agenda'), 
                     form.getvalue('title'), form.getvalue('start_date'),
                     form.getvalue('start_time'), form.getvalue('recurring'),
-                    form.getvalue('end_date'), form.getvalue('venue'),
+                    form.getvalue('venue'),
                     form.getvalue('requester'), form.getvalue('invitees'))):
             self.is_valid = False
             self.error = "Class:MeetingInvite, Method: __load_form, Error:Not all form fields \
@@ -308,7 +327,10 @@ class MeetingInvite(object):
         self.start_time = form.getvalue('start_time')        # hh:mm 24 hr string 
         self.duration = form.getvalue('duration')            # mm string
         self.recurring = form.getvalue('recurring')          # string
-        self.end_date = form.getvalue('end_date')            # yyyy-mm-dd string
+        if form.getvalue('end_date'):                        # end_date is now optional.
+            self.end_date = form.getvalue('end_date')        # yyyy-mm-dd string
+        else:
+            self.end_date = None
         self.venue = form.getvalue('venue')                  # string
         self.requester = form.getvalue('requester')          # you@example.com string
         self.invitees = form.getvalue('invitees')            # wysiwyg html string    
@@ -348,13 +370,14 @@ class MeetingInvite(object):
         #else:
             #logging.info("good start_date: %s" % self.start_date)
         
-        result2 = re.search(regex_date, self.end_date)
-        if result2 == None:
-            self.is_valid = False
-            self.error = "bad end_date: %r" % self.end_date
-            logging.info("Class:MeetingInvite, Method: __validate, ERROR: %s" % self.error)
-        #else:
-        #    logging.info("good end_date: %s" % self.end_date)
+        if self.end_date:
+            result2 = re.search(regex_date, self.end_date)
+            if result2 == None:
+                self.is_valid = False
+                self.error = "bad end_date: %r" % self.end_date
+                logging.info("Class:MeetingInvite, Method: __validate, ERROR: %s" % self.error)
+            #else:
+            #    logging.info("good end_date: %s" % self.end_date)
 
         result3 = re.search(regex_time, self.start_time)
         if result3 == None:

@@ -51,7 +51,7 @@ class TestEammFrontendSurveyWebpage(unittest.TestCase):
     def test_show_survey1(self):
         ok = True
         error = None
-        url = 'http://127.0.0.1/eamm/complete_survey.py?var1=24&var2=test@test.com'
+        url = 'http://127.0.0.1/eamm/complete_survey.py?var1=1&var2=test@test.com'
         request = urllib2.Request(url)
         try:
             urllib2.urlopen(request)
@@ -61,7 +61,7 @@ class TestEammFrontendSurveyWebpage(unittest.TestCase):
         self.assertTrue(ok, "HTTP error code %s" % error)
     
     def test_show_survey2(self):
-        url = 'http://127.0.0.1/eamm/complete_survey.py?var1=24&var2=test@test.com'
+        url = 'http://127.0.0.1/eamm/complete_survey.py?var1=1&var2=test@test.com'
         f = urllib2.urlopen(url)
         data = f.read()
         f.close
