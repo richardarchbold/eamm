@@ -1,0 +1,6 @@
+AuthType Basic
+AuthName "Plz enter your email_address and EAMM password"
+# (Following line optional)
+AuthBasicProvider file
+AuthUserFile /etc/apache2/passwd/eamm.passwd
+Require user richardarchbold@gmail.com
