@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import cgitb; cgitb.enable(display=1)
 
 import re
+from random import randint
 
 # setup basic logging config
 logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
@@ -436,6 +437,40 @@ class MeetingInvite(object):
         logging.info("emails: %s", tuple(self.invitees_list))
         
         return self.is_valid
+
+    def test(self, start_date, requester):
+        """
+        self.purpose = form.getvalue('purpose')              # wysiwyg html string
+        self.justification = form.getvalue('justification')  # wysiwyg html string
+        self.id_template = form.getvalue('template')         # integer
+        self.agenda = form.getvalue('agenda')                # wysiwyg html string
+        self.title = form.getvalue('title')                  # string
+        self.start_date = form.getvalue('start_date')        # yyyy-mm-dd string
+        self.start_time = form.getvalue('start_time')        # hh:mm 24 hr string 
+        self.duration = form.getvalue('duration')            # mm string
+        self.recurring = form.getvalue('recurring')          # string
+        self.end_date = None
+        self.venue = form.getvalue('venue')                  # string
+        self.requester = form.getvalue('requester')          # you@example.com string
+        self.invitees_list                                   # list
+        """
+        
+        self.db_connection = eamm.backend.database.MyDatabase(autocommit="off")
+        fluff = randint(100,999)
+        self.requester = requester
+        self.start_date = start_date
+        self.title = "%s: this is a testing meeting by %s on %s" %(fluff, requester, start_date)
+        self.purpose = "%s: this is a testing meeting by %s on %s" %(fluff, requester, start_date)
+        self.justification = "test"
+        self.id_template = 2
+        self.agenda = "test %s" % fluff
+        self.start_date = start_date
+        self.start_time = "09:00"
+        self.duration = "45"
+        self.recurring = "none"
+        self.end_date = self.start_date
+        self.venue = "test"
+        self.invitees_list = ['a@a.com', 'b@b.com']
 
         
     def __get_invitees(self):

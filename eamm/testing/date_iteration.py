@@ -3,7 +3,7 @@
 def is_weekday(date):
     pass
 
-start_date  = 16 (wed)
+start_date  = 16 #(wed)
 end_date    = 30
 
 # recur daily

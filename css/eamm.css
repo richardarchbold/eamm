@@ -8,7 +8,7 @@ table, tr, td {
 	border-collapse: collapse;
 	border: 2px solid black;
 	padding: 0.3cm;
-	vertical-align: center
+	vertical-align: center;
 }
 
 table {
@@ -22,6 +22,21 @@ table {
 	text-align: center;
 	font-size: 16pt;
 	font-weight: bold;
+}
+
+.red {
+	background-color: #FF0000;
+	width: 130px;
+}
+
+.ggreen {
+	width: 130px;
+	background-color: #00FF00; 
+}
+
+.amber {
+	background-color: #FFA500;
+	 width: 130px;
 }
 
 .header a:link {color:#000000;}
@@ -66,6 +81,14 @@ table {
 	background-color: #cfe7f5;
 }
 
+.sub_col_1a {
+	background-color: #cfe7f5;
+}
+
+.sub_col_2a {
+	width: 130px;
+	background-color: #cfe7f5;
+}
 img {
 	border: none;
 }

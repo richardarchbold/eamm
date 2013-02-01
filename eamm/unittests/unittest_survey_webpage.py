@@ -61,8 +61,17 @@ class TestEammFrontendSurveyWebpage(unittest.TestCase):
         self.assertTrue(ok, "HTTP error code %s" % error)
     
     def test_show_survey2(self):
-        url = 'http://127.0.0.1/eamm/complete_survey.py?var1=1&var2=test@test.com'
-        f = urllib2.urlopen(url)
+        #url = 'http://127.0.0.1/eamm/complete_survey.py?var1=1&var2=test@test.com'
+        #f = urllib2.urlopen(url)
+        
+        SERVER = 'http://127.0.0.1/eamm/'
+        authinfo = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        authinfo.add_password(None, SERVER, 'test', 'test-pass')
+        page = 'HTTP://'+SERVER+'complete_survey.py?var1=1&var2=test@test.com'
+        handler = urllib2.HTTPBasicAuthHandler(authinfo)
+        myopener = urllib2.build_opener(handler)
+        urllib2.install_opener(myopener)
+        f = urllib2.urlopen(page)
         data = f.read()
         f.close
         match = re.search('my test title xyz', data)
