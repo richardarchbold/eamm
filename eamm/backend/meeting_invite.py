@@ -147,7 +147,7 @@ class MeetingInvite(object):
             #
             # we re-use the same db_connection for all of these, so we can do a single commit
             # at the end.
-            if (self.recurring == "none"):
+            if self.recurring == "none":
                 my_meeting = eamm.backend.meeting.Meeting()
                 if self.db_connection:
                     my_meeting.db_connection = self.db_connection
@@ -158,6 +158,16 @@ class MeetingInvite(object):
                     to my_meeting.db_connection"
                     logging.info(self.error)
                     return
+            elif self.recurring == "weekly":
+                # ok, weekly recurring meetings, can't be to hard to figure out dates.
+                # we have a start_datetime and end_datetime from form.
+                # we also have start_date and end_date from the form.
+                #
+                # while (start_date <= end_date):
+                #    meeting.add(foo, bar, etc)
+                #    start_date += 7 days
+                #
+                pass
             else:
                 # TODO: we'll deal with recurring meetings later
                 pass

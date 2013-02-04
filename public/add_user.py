@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+import sys
+sys.path.append("/home/richard/workspace/eamm/")
+
 '''
 Created on 3 Jan 2013
 @author: richard

@@ -17,6 +17,7 @@ __authors__ = [
 
 import eamm.backend.database
 import logging
+import commands
 
 # setup basic logging config
 logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
@@ -62,11 +63,25 @@ class User(object):
             IOError: An error occurred accessing the table.Table object.
         """
 
+        cmd = '/usr/bin/htpasswd -b /etc/apache2/passwd/eamm.passwd %s %s' % (email_addr, password)
+        (ret_code, ret_text) = commands.getstatusoutput(cmd)
+        
+        if (ret_code != 0):
+            logging.info("Couldn't add user to htpasswd file - %s" % ret_text)
+            return False
+
         sql = "insert into User (full_name, email_addr, username, password) values ('%s', '%s', '%s', '%s')" % (full_name, email_addr, username, password)
     
         # no need to try/catch/rasie these, as the subclass takes care of that.
         my_db_connection = eamm.backend.database.MyDatabase()
-        my_db_connection.insert(sql)  
+        my_db_connection.insert(sql)
+        
+        # now add to htaccess file.
+        # /usr/bin/htpasswd -b email_addr password
+        # /usr/bin/htpasswd -b username password
+        cmd = '/usr/bin/htpasswd -b %s %s' % (email_addr, password)
+        ret = commands.getstatusoutput(cmd)
+        
         return True
     
     def is_already_registered(self, email_addr, username):

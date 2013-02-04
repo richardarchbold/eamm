@@ -15,6 +15,11 @@ table {
 	width: 800px;
 }
 
+.button {
+    width: 300px;
+}
+
+
 .header {
 	background-color: #4700b8;
 	height: 28px;
@@ -24,6 +29,29 @@ table {
 	font-weight: bold;
 }
 
+
+.login_col1 {
+    background-color: #4700b8;
+    padding: 0.3cm;
+    text-align: center;
+    font-size: 16pt;
+    font-weight: bold;
+    width: 195px;
+}
+
+.boxy {
+    background-color: #F2F2F2;
+    font-style: italic;
+}
+
+.padded {
+    padding-left: 30px;
+}
+
+.bigtxt {
+    font-size: large;
+}
+
 .red {
 	background-color: #FF0000;
 	width: 130px;
@@ -31,7 +59,7 @@ table {
 
 .ggreen {
 	width: 130px;
-	background-color: #00FF00; 
+	background-color: #00FF00;
 }
 
 .amber {

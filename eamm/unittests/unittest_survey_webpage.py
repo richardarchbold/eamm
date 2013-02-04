@@ -46,36 +46,23 @@ class TestEammFrontendSurveyWebpage(unittest.TestCase):
         return_value = my_page5.parse_query_string() 
         self.assertFalse(return_value)
     
-    # test that the URL is returning a 200 error code, which it pretty much 
-    # always should be if we are using "import cgitb; cgitb.enable(display=1)"
-    def test_show_survey1(self):
-        ok = True
-        error = None
-        url = 'http://127.0.0.1/eamm/complete_survey.py?var1=1&var2=test@test.com'
-        request = urllib2.Request(url)
-        try:
-            urllib2.urlopen(request)
-        except urllib2.HTTPError as e:
-            error = e.code
-            ok = False 
-        self.assertTrue(ok, "HTTP error code %s" % error)
     
-    def test_show_survey2(self):
-        #url = 'http://127.0.0.1/eamm/complete_survey.py?var1=1&var2=test@test.com'
-        #f = urllib2.urlopen(url)
+    # test that the survey page is working.
+    def test_show_survey1(self):     
+        username = 'test'
+        password = 'test-pass'
+        url = 'http://127.0.0.1/eamm/private/complete_survey.py?var1=1&var2=test@test.com'
         
-        SERVER = 'http://127.0.0.1/eamm/'
-        authinfo = urllib2.HTTPPasswordMgrWithDefaultRealm()
-        authinfo.add_password(None, SERVER, 'test', 'test-pass')
-        page = 'HTTP://'+SERVER+'complete_survey.py?var1=1&var2=test@test.com'
-        handler = urllib2.HTTPBasicAuthHandler(authinfo)
-        myopener = urllib2.build_opener(handler)
-        urllib2.install_opener(myopener)
-        f = urllib2.urlopen(page)
+        passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+        passman.add_password(None, url, username, password)
+        urllib2.install_opener(urllib2.build_opener(urllib2.HTTPBasicAuthHandler(passman)))
+
+        req = urllib2.Request(url)
+        f = urllib2.urlopen(req)
         data = f.read()
-        f.close
         match = re.search('my test title xyz', data)
         self.assertTrue(match)
+
     
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

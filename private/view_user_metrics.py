@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+import sys
+sys.path.append("/home/richard/workspace/eamm/")
+
 # using this to determine GET or POST.
 import os
 import logging
