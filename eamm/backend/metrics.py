@@ -4,7 +4,9 @@ def get_tot_avg_score(user):
     db_conn = eamm.backend.database.MyDatabase()
     sql = """
     SELECT avg(s.survey_response_rating)
-    FROM EAMM.Meeting as m INNER JOIN EAMM.Invite as i INNER JOIN EAMM.Survey as s
+    FROM EAMM.Meeting as m 
+        INNER JOIN EAMM.Invite as i 
+        INNER JOIN EAMM.Survey as s
     WHERE m.meeting_chair=%s 
     and   s.survey_response_rating != 0
     and   m.idInvite = i.idInvite 
@@ -18,7 +20,9 @@ def get_avg_score_per_meeting(user):
     db_conn = eamm.backend.database.MyDatabase()
     sql = """
     SELECT m.start_time, i.title, avg(s.survey_response_rating)
-    FROM EAMM.Meeting as m INNER JOIN EAMM.Invite as i INNER JOIN EAMM.Survey as s
+    FROM EAMM.Meeting as m 
+        INNER JOIN EAMM.Invite as i 
+        INNER JOIN EAMM.Survey as s
     WHERE m.meeting_chair=%s
     and   s.survey_response_rating != 0
     and   m.idInvite = i.idInvite 

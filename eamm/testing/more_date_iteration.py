@@ -2,8 +2,6 @@
 
 from datetime import datetime, timedelta
 
-import re
-
 def main():
     # ok, weekly recurring meetings, can't be to hard to figure out dates.
     # we have a start_datetime and end_datetime from form.
@@ -16,9 +14,7 @@ def main():
     # set up initial variables.
     start_datetime = "2013-01-01 11:00"
     end_datetime   = "2013-01-28 11:45"
-    start_date     = "2013-01-01"
-    end_date       = "2013-01-31"
-    start_time     = "11:00"
+
     duration       = 45
     
     dt_start   = datetime.strptime(start_datetime, "%Y-%m-%d %H:%M")

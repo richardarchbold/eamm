@@ -7,12 +7,16 @@ body {
 table, tr, td {
 	border-collapse: collapse;
 	border: 2px solid black;
-	padding: 0.3cm;
-	vertical-align: center;
+	padding: 0.2cm;
+	vertical-align: middle;
 }
 
 table {
 	width: 800px;
+}
+
+.t2 {
+    padding: 0.1cm;
 }
 
 .button {
@@ -23,7 +27,7 @@ table {
 .header {
 	background-color: #4700b8;
 	height: 28px;
-	padding: 0.3cm;
+	padding: 0.2cm;
 	text-align: center;
 	font-size: 16pt;
 	font-weight: bold;
@@ -79,6 +83,12 @@ table {
 	background-color: #00b8ff;
 	width: 120px;
 	font-weight: bold;
+}
+
+.col1n {
+    background-color: #00b8ff;
+    width: 20px;
+    font-weight: bold;
 }
 
 .aqua {

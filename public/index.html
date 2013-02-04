@@ -19,35 +19,36 @@
         </tr>
 
         <tr>
-          <td rowspan="2" class="login_col1"><img src="http://127.0.0.1/eamm/images/dilbert-meeting.jpg" width="187" height="176"/></td>
+          <td rowspan="2" class="login_col1">
+		  <img src="http://127.0.0.1/eamm/images/dilbert-meeting.jpg" width="187" height="176"/></td>
           <td class="padded">
 
             <br><br>
 
             <form>
-              <input class="button" type="button" value="Register for an account"
+              <input class="button" type="button" id="register" value="Register for an account"
               onClick="window.location.href='http://127.0.0.1/eamm/public/add_user.py'">
             </form>
 
             <br><br><br>
             <form>
-              <input class="button" type="button" value="Create a new Meeting"
-              onClick="window.location.href='http://127.0.0.1/eamm/private/add_meeting.py'">
+              <input class="button" type="button" id="newMeeting" value="Create a new Meeting"
+              onClick="window.location.href='http://127.0.0.1/eamm/private/add_meeting_invite.py'">
              </form>
 
              <form>
-              <input class="button" type="button" value="View & Edit Existing Meetings"
-              onClick="window.location.href='http://127.0.0.1/eamm/public/add_user.py'">
+              <input class="button" type="button" id="viewMeeting" value="View & Edit Existing Meetings"
+              onClick="window.location.href='http://127.0.0.1/eamm/private/view_meetings.py'">
              </form>
 
              <form>
-              <input class="button" type="button" value="Complete an EAMM Survey"
-              onClick="window.location.href='http://127.0.0.1/eamm/public/complete_survey.py'">
+              <input class="button" type="button" id="survey" value="Complete an EAMM Survey"
+              onClick="window.location.href='http://127.0.0.1/eamm/private/complete_survey.py'">
              </form>
 
              <form>
-              <input class="button" type="button" value="View Meeting Metrics"
-              onClick="window.location.href='http://127.0.0.1/eamm/public/view_user_metrics.py'">
+              <input class="button" type="button" id="viewmetrics" value="View Meeting Metrics"
+              onClick="window.location.href='http://127.0.0.1/eamm/private/view_user_metrics.py'">
              </form>
 
           </td>

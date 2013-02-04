@@ -93,6 +93,12 @@ class Meeting(object):
             logging.info("self.id_meeting could not be set")
             return False
 
+class Search(object):
+    def __init__(self):
+        pass
+    
+    def search(self, **kwargs):
+        pass
         
          
     

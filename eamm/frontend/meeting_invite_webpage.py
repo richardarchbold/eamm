@@ -299,23 +299,24 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
     def add_meeting_invite_step_4(self, form):
         self.set_title("Create a new meeting invite :: Step 4 (last one!")
         
-        purpose = form.getvalue('purpose')
+        self.purpose = form.getvalue('purpose')
         #justification = form.getvalue('justification')
-        id_template = form.getvalue('template')
-        agenda = form.getvalue('agenda')
-        title = form.getvalue('title')
-        start_date = form.getvalue('start_date')
-        start_time = form.getvalue('start_time')
-        duration = form.getvalue('duration')
-        recurring = form.getvalue('recurring')
-        end_date = form.getvalue('end_date')
-        venue = form.getvalue('venue')
-        requester = form.getvalue('requester')
-        invitees = form.getvalue('invitees')
-        
+        self.id_template = form.getvalue('template')
+        self.agenda = form.getvalue('agenda')
+        self.title = form.getvalue('title')
+        self.start_date = form.getvalue('start_date')
+        self.start_time = form.getvalue('start_time')
+        self.duration = form.getvalue('duration')
+        self.recurring = form.getvalue('recurring')
+        self.end_date = form.getvalue('end_date')
+        self.venue = form.getvalue('venue')
+        self.requester = form.getvalue('requester')
+        self.invitees = form.getvalue('invitees')
+        self.button = "Save & Send"
         
         my_template = eamm.backend.meeting_template.MeetingTemplate()
-        my_template.get(id_template)
+        my_template.get(self.id_template)
+        self.template_title = my_template.title
         
         html = """
         <form id="add_meeting_invite" name="add_meeting_invite" method="post" action="/eamm/private/add_meeting_invite.py"> 
@@ -324,7 +325,13 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         
         html += self.hide_past_form_contents(form)
         
-        html += """
+        html += self.display_meeting_invite_table()
+        
+        self.add_to_body(html)
+        
+    
+    def display_meeting_invite_table(self):
+        html = """
         <table>
         
           <tr>
@@ -389,12 +396,16 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
           </tr>
           
           <tr>
-            <td class="header" colspan="3"><input type="submit" value="Save and Send"/></td>
+            <td class="header" colspan="3"><input type="submit" value="%s"/>
+            </td>
           </tr>
         </table>
-        """ % (requester, invitees, title, start_date, start_time, duration, recurring, end_date, venue, my_template.title, purpose, agenda)
+        """ % (self.requester, self.invitees, self.title, self.start_date, 
+               self.start_time, self.duration, self.recurring, self.end_date, 
+               self.venue, self.template_title, self.purpose, self.agenda,
+               self.button)
         
-        self.add_to_body(html)
+        return html
 
     def add_meeting_invite_step_5(self, form):
         self.set_title("Create a new meeting invite :: DONE !")
@@ -431,3 +442,4 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
                                          failed with message <b>%s</b>" % new_invite.error)
             
         self.add_to_body(html)
+        

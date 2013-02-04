@@ -81,7 +81,7 @@ class User(object):
         # /usr/bin/htpasswd -b username password
         cmd = '/usr/bin/htpasswd -b %s %s' % (email_addr, password)
         ret = commands.getstatusoutput(cmd)
-        
+        logging.info("return value from htpasswd: %s" % ret)
         return True
     
     def is_already_registered(self, email_addr, username):
