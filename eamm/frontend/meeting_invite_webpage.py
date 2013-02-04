@@ -42,7 +42,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         self.set_title("Create a new meeting invite :: Step 1")   
       
         html = """
-        <form id="add_meeting_invite" name="add_meeting_invite" method="post" action="/eamm/add_meeting_invite.py"> 
+        <form id="add_meeting_invite" name="add_meeting_invite" method="post" action="/eamm/private/add_meeting_invite.py"> 
         <input type="hidden" name="step" value="step1" />
         
         <table>
@@ -125,7 +125,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         my_template.get(id_template)
         
         html = """
-        <form id="add_meeting_invite" name="add_meeting_invite" method="post" action="/eamm/add_meeting_invite.py"> 
+        <form id="add_meeting_invite" name="add_meeting_invite" method="post" action="/eamm/private/add_meeting_invite.py"> 
         <input type="hidden" name="step" value="step2" />
         """
         html += self.hide_past_form_contents(form)
@@ -206,7 +206,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         my_template.get(id_template)
         
         html = """
-        <form name="add_meeting_invite" id="add_meeting_invite" onsubmit="return validateStep3Form()" method="post" action="/eamm/add_meeting_invite.py"> 
+        <form name="add_meeting_invite" id="add_meeting_invite" onsubmit="return validateStep3Form()" method="post" action="/eamm/private/add_meeting_invite.py"> 
         <input type="hidden" name="step" value="step3" /> 
         """
         
@@ -318,7 +318,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         my_template.get(id_template)
         
         html = """
-        <form id="add_meeting_invite" name="add_meeting_invite" method="post" action="/eamm/add_meeting_invite.py"> 
+        <form id="add_meeting_invite" name="add_meeting_invite" method="post" action="/eamm/private/add_meeting_invite.py"> 
         <input type="hidden" name="step" value="step4" />
         """
         

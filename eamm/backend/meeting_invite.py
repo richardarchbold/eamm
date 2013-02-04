@@ -127,8 +127,8 @@ class MeetingInvite(object):
             logging.info("start __add_to_invite_tbl")
             self.__add_to_invite_tbl()
             logging.info("finish __add_to_invite_tbl, is_valid=%s" % self.is_valid)
-            # if the __add_to_invite_tbl failed, it will set the is_valid bool to false and stick the
-            # error message is self.error
+            # if the __add_to_invite_tbl failed, it will set the is_valid bool to false 
+            # and stick the error message is self.error
             if self.is_valid == False:
                 return
                 
@@ -151,11 +151,12 @@ class MeetingInvite(object):
                 my_meeting = eamm.backend.meeting.Meeting()
                 if self.db_connection:
                     my_meeting.db_connection = self.db_connection
-                    my_meeting.add(self.id_invite, self.start_datetime, self.end_datetime, self.requester)
+                    my_meeting.add(self.id_invite, self.start_datetime, self.end_datetime, 
+                                   self.requester)
                 else:
                     self.is_valid = False
-                    self.error = "meeting_invite.add() self.db_connection is dead and can't be passed \
-                    to my_meeting.db_connection"
+                    self.error = "meeting_invite.add() self.db_connection is dead and can't \
+                    be passed to my_meeting.db_connection"
                     logging.info(self.error)
                     return
             elif self.recurring == "weekly":
@@ -167,13 +168,40 @@ class MeetingInvite(object):
                 #    meeting.add(foo, bar, etc)
                 #    start_date += 7 days
                 #
-                pass
+                
+                # set up the datetime variables for the very start and very end of the dates
+                # provided by the requester.
+                dt_start   = datetime.strptime(self.start_datetime, "%Y-%m-%d %H:%M:%S")
+                dt_end     = self.end_datetime
+    
+                # check to make sure that the latest start date is still before the 
+                # series end date
+                while (dt_start <= dt_end):
+                    # define the dates of the instance in the series.
+                    mt_start = dt_start
+                    mt_end   = dt_start + timedelta(minutes=int(self.duration))
+                    logging.info("start: %s" % mt_start)
+                    logging.info("end:   %s" % mt_end)
+                        
+                    # add the meeting to the Meeting table.
+                    my_meeting = eamm.backend.meeting.Meeting()
+                    if self.db_connection:
+                        my_meeting.db_connection = self.db_connection
+                        my_meeting.add(self.id_invite, mt_start, mt_end, self.requester)
+                    else:
+                        self.is_valid = False
+                        self.error = "meeting_invite.add() self.db_connection is dead and \
+                        can't be passed to my_meeting.db_connection"
+                        logging.info(self.error)
+                    
+                    # skip the start date forward 7 days.
+                    dt_start += timedelta(days=7)
             else:
-                # TODO: we'll deal with recurring meetings later
+                # TODO: we'll deal other recurring meeting patterns later
                 pass
                   
-            # if the my_meeting.add() method failed, it will set the is_valid bool to false and stick the
-            # error message is self.error
+            # if the my_meeting.add() method failed, it will set the is_valid bool to false 
+            # and stick the error message is self.error
             if my_meeting.is_valid == False:
                 self.is_valid = False
                 self.error = my_meeting.error
@@ -249,8 +277,8 @@ class MeetingInvite(object):
             my_db_connection = eamm.backend.database.MyDatabase()
             if not my_db_connection:
                 self.is_valid = False
-                self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, ERROR: Couldn't create \
-                              MyDatabase object"
+                self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, ERROR: Couldn't \
+                create MyDatabase object"
                 return False
                 
         # execute the insert2, if it worked, the returned value will be the auto-incremented 
@@ -267,13 +295,13 @@ class MeetingInvite(object):
             # check that the return code is indeed good, and use it to set self.id_invite
             if my_last_insert_id > 0:  
                 self.id_invite = my_last_insert_id
-                logging.info("Class:MeetingInvite, Method: __add_to_invite_tbl, self.id_invite has \
-                been set to %s", self.id_invite)
+                logging.info("Class:MeetingInvite, Method: __add_to_invite_tbl, self.id_invite \
+                has been set to %s", self.id_invite)
                 return True
             else:
                 self.is_valid = False
-                self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, error: self.id_invite \
-                could not be set, last_insert_id is %s" % my_last_insert_id
+                self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, error: \
+                self.id_invite could not be set, last_insert_id is %s" % my_last_insert_id
                 logging.info(self.error)
                 return False
 
@@ -292,8 +320,8 @@ class MeetingInvite(object):
         my_db_connection = eamm.backend.database.MyDatabase()
         if not my_db_connection:
             self.is_valid = False
-            self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, ERROR: Couldn't create \
-                          MyDatabase object"
+            self.error = "Class:MeetingInvite, Method: __add_to_invite_tbl, ERROR: Couldn't \
+            create MyDatabase object"
             return False
         
         # execute the select and check to make sure it worked.
@@ -301,7 +329,7 @@ class MeetingInvite(object):
         if not my_query_results:
             self.is_valid = False
             self.error = "Class:MeetingInvite, Method: __already_exists, Error: Couldn't \
-                          select row, Message: %s" % my_db_connection.error
+            select row, Message: %s" % my_db_connection.error
             return False
         else:
             if my_query_results[0][0] == 0:
@@ -310,7 +338,8 @@ class MeetingInvite(object):
                 return 0
             else:
                 logging.info("Invite for %s DOES already exist in DB" % self.title)
-                self.error = "Invite for meeting with Title \"%s\" DOES already exist in DB" % self.title
+                self.error = "Invite for meeting with Title \"%s\" DOES already exist in \
+                DB" % self.title
                 self.is_valid = False
                 return True
 
@@ -325,8 +354,8 @@ class MeetingInvite(object):
                     form.getvalue('venue'),
                     form.getvalue('requester'), form.getvalue('invitees'))):
             self.is_valid = False
-            self.error = "Class:MeetingInvite, Method: __load_form, Error:Not all form fields \
-            contain data"
+            self.error = "Class:MeetingInvite, Method: __load_form, Error:Not all form \
+            fields contain data"
             return False
         
         self.purpose = form.getvalue('purpose')              # wysiwyg html string
@@ -423,16 +452,20 @@ class MeetingInvite(object):
         
             if re.match('^[\w\-\.]+@[\w\.\-]+\.\w+$', line):
                 # the above is a crude regex for an email address.
-                logging.info("Class:MeetingInvite, Method: __validate, invitees, line is an email address: %s\n\n" % line)
+                logging.info("Class:MeetingInvite, Method: __validate, invitees, line is an \
+                email address: %s\n\n" % line)
                 invitee_list.append(line)
             elif re.match('\W+$', line):
                 # it's a pure white space line, so skip it.
-                logging.info("Class:MeetingInvite, Method: __validate, invitees, line is non-word chars, skipping")
+                logging.info("Class:MeetingInvite, Method: __validate, invitees, line is non-word \
+                chars, skipping")
                 pass
             else:
                 # bugs crud
-                logging.info("Class:MeetingInvite, Method: __validate, invitees, line is NOT an email address: %s\n\n" % line)
-                self.error = "Class:MeetingInvite, Method: __validate, invitees, line is NOT an email address: %s\n\n" % line
+                logging.info("Class:MeetingInvite, Method: __validate, invitees, line is NOT \
+                an email address: %s\n\n" % line)
+                self.error = "Class:MeetingInvite, Method: __validate, invitees, line is NOT \
+                an email address: %s\n\n" % line
                 self.is_valid = False
             i+=1
         

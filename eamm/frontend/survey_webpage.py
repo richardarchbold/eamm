@@ -82,7 +82,7 @@ class SurveyWebpage(eamm.frontend.base_webpage.WebPage):
         
         html = """
         
-          <form action="/eamm/complete_survey.py" id="survey" method="post">
+          <form action="/eamm/private/complete_survey.py" id="survey" method="post">
           <input type="hidden" name="id_invite" value="%s" />
           <input type="hidden" name="id_meeting" value="%s" />
           <input type="hidden" name="email_addr" value="%s" />
