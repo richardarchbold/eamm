@@ -147,6 +147,10 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
     def __add_meeting_row(self, row):
         url = "http://127.0.0.1/eamm/private/view_meeting.py"
         
+        # row[0] = m.start_time,      # row[1] = i.duration, 
+        # row[2] = i.venue            # row[3] = i.requester_email_addr,
+        # row[4] = i.title            # row[5] = m.idMeeting
+        
         link = """
         <a href="%s?var1=%s">%s</a>
         """ % (url, row[5], row[4])
