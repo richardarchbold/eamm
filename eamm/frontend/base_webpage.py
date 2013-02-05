@@ -1,6 +1,7 @@
 import logging
 
 
+
 # setup basic logging config
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
 
@@ -85,6 +86,9 @@ class WebPage(object):
         return html
     
     def display_meeting_invite_table(self):
+    
+        invitees_list = ', '.join(self.invitees)
+        
         html = """
         <table>
         
@@ -116,7 +120,7 @@ class WebPage(object):
           
           <tr>
             <td class="col1">Duration:</td>
-            <td class="col2_top">%s</td>
+            <td class="col2_top">%s mins</td>
           </tr>
           
           <tr>
@@ -154,7 +158,7 @@ class WebPage(object):
             </td>
           </tr>
         </table>
-        """ % (self.requester, self.invitees, self.title, self.start_date, 
+        """ % (self.requester, invitees_list, self.title, self.start_date, 
                self.start_time, self.duration, self.recurring, self.end_date, 
                self.venue, self.template_title, self.purpose, self.agenda,
                self.button)

@@ -6,6 +6,8 @@ import logging
 import eamm.frontend.base_webpage
 import eamm.backend.database
 import eamm.backend.meeting_invite
+import eamm.backend.meeting_template
+import re
 
 # setup basic logging config
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
@@ -131,9 +133,24 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
         return rows        
     
     def display_this_meeting(self, id_meeting):
-        this_meeting = eamm.backend.meeting.Meeting(id_meeting)
-        id_invite = this_meeting.id_invite
-        this_invite  = eamm.backend.meeting_invite.MeetingInvite(id_invite)
+        this_meeting  = eamm.backend.meeting.Meeting(id_meeting)
+        id_invite     = this_meeting.id_invite
+        this_invite   = eamm.backend.meeting_invite.MeetingInvite(id_invite)
+        this_template = eamm.backend.meeting_template.MeetingTemplate()
+        this_template.get(this_invite.id_template)
+        
+        m = re.search('^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):\d+$', 
+                      str(this_meeting.start_datetime))
+        
+        logging.info(str(this_meeting.start_datetime))
+        YYYY = m.group(1)
+        MM   = m.group(2)
+        DD   = m.group(3)
+        hh   = m.group(4)
+        mm   = m.group(5) 
+    
+        start_date = "%s-%s-%s" % (YYYY, MM, DD)
+        start_time = "%s:%s" % (hh, mm)
         
         self.set_title("View Meeting Titled: \"%s\"" % this_invite.title)
         
@@ -145,13 +162,13 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
         self.requester      = this_invite.requester
         self.invitees       = this_invite.invitees_list
         self.title          = this_invite.title
-        self.start_date     = this_meeting.start_datetime
-        self.start_time     = "FIXME"
+        self.start_date     = start_date
+        self.start_time     = start_time
         self.duration       = this_invite.duration
         self.recurring      = this_invite.recurring
         self.end_date       = this_meeting.end_datetime
         self.venue          = this_invite.venue
-        self.template_title = "FIXME"
+        self.template_title = this_template.title
         self.purpose        = this_invite.purpose
         self.agenda         = this_invite.agenda
         self.button         = "OK"
