@@ -23,8 +23,8 @@ def main():
     
     elif os.environ['REQUEST_METHOD'] == 'POST':
         form = cgi.FieldStorage()
-        #logging.info("form type: %s" % type(form))
-        this_webpage.display(user, form)
+        logging.info("form type: %s" % type(form))
+        this_webpage.display_search_results(user, form)
         
     this_webpage.render()
     

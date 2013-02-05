@@ -13,10 +13,31 @@ import re
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
 
 class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
+    #############
+    # 
     def __init__(self):
         super(MeetingWebPage, self).__init__()
-        self.user = ""
+        self.user = None
+        self.form = None
+        self.table_top = """
+        <TABLE>
+          <TR>
+            <TD colspan="6" class="aqua"> %s </TD>
+          </TR>
+
+          <TR>
+            <TD rowspan="%s" class="col1n"> </TD>
+            <TD class="col2_top" style="width: 65px;">Date</TD>
+            <TD class="col2_top" style="width: 65px;">Venue</TD>
+            <TD class="col2_top" style="width: 60px;">Requester</TD>
+            <TD colspan="2" class="col2_top">Title</TD>
+          </TR>
+        """
+    #
+    ############
     
+    #############
+    # 
     def display(self, user):
         self.user = user
         
@@ -32,37 +53,6 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
         self.set_title("View Meetings for %s" % self.user)
     
         html = """
-        <TABLE>
-          <TR>
-            <TD colspan="6" class="aqua"> Quick View - My Meetings +/- 7 days 
-            </TD>
-          </TR>
-
-          <TR>
-            <TD rowspan="%s" class="col1n"> </TD>
-            <TD class="col2_top" style="width: 65px;">Date</TD>
-            <TD class="col2_top" style="width: 65px;">Venue</TD>
-            <TD class="col2_top" style="width: 60px;">Requester</TD>
-            <TD colspan="2" class="col2_top">Title</TD>
-          </TR>
-        """ % rowspan
-        
-        for row in user_meetings:
-            url = "http://127.0.0.1/eamm/private/view_meeting.py"
-            link = """
-            <a href="%s?var1=%s">%s</a>
-            """ % (url, row[5], row[4])
-            html += """
-            <TR>
-              <TD>%s</TD>
-              <TD>%s</TD>
-              <TD>%s</TD>
-              <TD colspan="2">%s</TD>
-            </TR>
-            """ % (row[0], row[2], row[3], link)
-
-        html += """</table>
-        <br>
         <form name="search_meetings" method="post"
          action="/eamm/private/view_meetings.py"> 
         <table>
@@ -101,37 +91,81 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
 
         </TABLE>
         </form>
+        <br><br>
+        """
+    
+        table_title = "Quick View - My Meetings +/- 7 days"
+        html += self.table_top % (table_title, rowspan)
+        
+        for row in user_meetings:
+            html += self.__add_meeting_row(row)
+        
+        html += """</table>
+        <br>
         """
         
         self.add_to_body(html)
         return
+    #
+    ############
     
-    
-    def __get_recent_meetings(self):
-        db_conn = eamm.backend.database.MyDatabase()
-        sql = """
-        select m.start_time, i.duration, i.venue, 
-               i.requester_email_addr, i.title, m.idMeeting
-        from EAMM.Meeting as m, 
-          EAMM.Invite as i,
-          EAMM.Invitee as v
-        where m.idInvite=i.idInvite 
-          and m.idInvite=v.idInvite
-          and m.start_time <= date_add(now(), interval 7 day)
-          and m.start_time >= date_add(now(), interval -7 day)
-          and (
-            v.invitee_email_addr=%s
-            OR
-            i.requester_email_addr=%s
-          )
-        order by m.start_time desc
+    #############
+    #    
+    def display_search_results(self, user, form): 
+        self.user = user
+        self.form = form
+        
+        table_title = "Search Results"
+        self.set_title(table_title)
+        
+        try:
+            search_results = self.__search()
+        except Exception as e:
+            err = self.error_table("Could not search for  meetings - %s" % e)
+            self.add_to_body(err)
+            return
+        
+        # because the headings are also a row
+        rowspan = len(search_results) + 1
+        
+        html = self.table_top % (table_title, rowspan)
+
+        for row in search_results:
+            html += self.__add_meeting_row(row)
+        
+        html += """</table>
+        <br>
         """
-            
-        sql_vars = [self.user, self.user]
-        rows = db_conn.select2(sql, sql_vars)
-           
-        return rows        
+        
+        self.add_to_body(html)
+        return   
+    #
+    ############
     
+    #############
+    # 
+    def __add_meeting_row(self, row):
+        url = "http://127.0.0.1/eamm/private/view_meeting.py"
+        
+        link = """
+        <a href="%s?var1=%s">%s</a>
+        """ % (url, row[5], row[4])
+        
+        tmp = """
+            <TR>
+              <TD>%s</TD>
+              <TD>%s</TD>
+              <TD>%s</TD>
+              <TD colspan="2">%s</TD>
+            </TR>
+        """ % (row[0], row[2], row[3], link)
+
+        return tmp
+    #
+    ############
+    
+    #############
+    # 
     def display_this_meeting(self, id_meeting):
         this_meeting  = eamm.backend.meeting.Meeting(id_meeting)
         id_invite     = this_meeting.id_invite
@@ -178,4 +212,93 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
         self.add_to_body(html)
         
         return
+    #
+    ############
     
+    #############
+    #    
+    def __search(self): 
+        sql = """
+        select  m.start_time, i.duration, i.venue, i.requester_email_addr,
+                i.title, m.idMeeting
+        from EAMM.Meeting as m, 
+          EAMM.Invite as i, 
+          EAMM.Invitee as v
+        where m.idInvite=i.idInvite
+          and m.idInvite=v.idInvite
+          and m.idInvite=v.idInvite
+          and (
+               v.invitee_email_addr=%s
+               OR
+               i.requester_email_addr=%s
+              )
+        """ 
+        sql_vars = [self.user, self.user]
+        
+        if self.form.getvalue('start_date'):
+            sql += """
+               and m.start_time > %s
+            """
+            sql_vars.append(self.form.getvalue('start_date'))
+           
+        if self.form.getvalue('end_date'):
+            sql += """
+               and m.end_time > %s
+            """
+            sql_vars.append(self.form.getvalue('end_date'))
+            
+        if self.form.getvalue('text_search'):
+            text_search = self.form.getvalue('text_search')
+            escaped_text_search = "%%%s%%" % text_search
+            
+            sql += """
+               and (
+                    i.title like %s
+                    or
+                    i.purpose like %s
+                    )
+            """
+            sql_vars.append(escaped_text_search)
+            sql_vars.append(escaped_text_search)
+        
+        sql += """
+        order by m.start_time
+        """
+        
+        logging.info("__search sql: %s" % sql) 
+        db_conn = eamm.backend.database.MyDatabase()
+        rows = db_conn.select2(sql, sql_vars)
+            
+        return rows
+    #
+    ############ 
+    
+    #############
+    # 
+    def __get_recent_meetings(self):
+        db_conn = eamm.backend.database.MyDatabase()
+        sql = """
+        select m.start_time, i.duration, i.venue, i.requester_email_addr, 
+               i.title, m.idMeeting
+        from EAMM.Meeting as m, 
+          EAMM.Invite as i,
+          EAMM.Invitee as v
+        where m.idInvite=i.idInvite 
+          and m.idInvite=v.idInvite
+          and m.start_time <= date_add(now(), interval 7 day)
+          and m.start_time >= date_add(now(), interval -7 day)
+          and (
+            v.invitee_email_addr=%s
+            OR
+            i.requester_email_addr=%s
+          )
+        order by m.start_time desc
+        """
+            
+        sql_vars = [self.user, self.user]
+        rows = db_conn.select2(sql, sql_vars)
+           
+        return rows        
+    #
+    ############
+        
