@@ -77,7 +77,8 @@ class MyDatabase(object):
             cursor.execute(select_stmt)
             rows = cursor.fetchall()    
         except Exception as e:
-            self.error = "Class: MyDatabase, Method: select, Message: %s" % str(e)
+            self.error = "Class: MyDatabase, Method: select, Message: %s" \
+            % str(e)
             logging.info(self.error)
             self.is_valid = False
             return False
@@ -96,7 +97,7 @@ class MyDatabase(object):
         
         if sql_vars:
             if type(sql_vars) is list:
-                logging.info("SELECT2: *was* passed a list of variables for substitution")
+                logging.info("SELECT2: *was* passed sql_vars for substitution")
                 count=0;
                 while count < len(sql_vars):
                     logging.info("sql_vars[%s] = %s" % (count, sql_vars[count]))
@@ -105,17 +106,19 @@ class MyDatabase(object):
                     cursor.execute(select_stmt, tuple(sql_vars))  
                 except Exception as e:
                     self.db.close()
-                    self.error = "Class: MyDatabase, Method: select2, Message: %s" % str(e)
+                    self.error = "Class: MyDatabase, Method: select2, Error: \
+                    %s" % str(e)
                     logging.info(self.error)
                     self.is_valid = False
                     return False
         else:    
-            logging.info("SELECT2: *was not* passed a list of variables for substitution")
+            logging.info("SELECT2: *was not* passed sql_vars for substitution")
             try:
                 cursor.execute(select_stmt)  
             except Exception as e:
                 self.db.close()
-                self.error = "Class: MyDatabase, Method: select2, Message: %s" % str(e)
+                self.error = "Class: MyDatabase, Method: select2, Error: \
+                %s" % str(e)
                 logging.info(self.error)
                 self.is_valid = False
                 return False
@@ -170,7 +173,8 @@ class MyDatabase(object):
             return my_id
     
     def insert2(self, insert_stmt, sql_vars, auto_increment=None):
-        logging.info("INSERT2(autocommit=%s):\n%s" % (self.autocommit, insert_stmt))
+        logging.info("INSERT2(autocommit=%s):\n%s" % (self.autocommit, 
+                                                      insert_stmt))
         
         if type(sql_vars) is list:
             logging.info("INSERT2: *was* passed a list of variables for substitution")
@@ -219,13 +223,28 @@ class MyDatabase(object):
         else:
             return True
         
-    def delete(self, delete_stmt):
+    def delete(self, delete_stmt, sql_vars=None):
         logging.info("DELETE:\n%s" % delete_stmt)
+        
+        if type(sql_vars) is list:
+            logging.info("DELETE: *was* passed sql_vars for substitution")
+            
+            # log each of the SQL vars passed.
+            count=0;
+            while count < len(sql_vars):
+                logging.info("sql_vars[%s] = %s" % (count, sql_vars[count]))
+                count+=1
         try:
-            # Execute the SQL command
+            # Execute the SQL command,
+            #    with or without sql_vars.
             cursor = self.db.cursor()
-            cursor.execute(delete_stmt)
-            # Commit your changes in the database
+            if sql_vars:
+                cursor.execute(delete_stmt, tuple(sql_vars))
+            else:
+                cursor.execute(delete_stmt)
+                
+            # Commit your changes in the database,
+            #    if appropriate.
             if self.autocommit:
                 self.db.commit()
         except Exception as e:
@@ -236,6 +255,8 @@ class MyDatabase(object):
             self.is_valid = False
             return False
 
-        # disconnect from server
-        self.db.close()
+        # disconnect from server,
+        #    if appropriate.
+        if self.autocommit:
+            self.db.close()
         return True

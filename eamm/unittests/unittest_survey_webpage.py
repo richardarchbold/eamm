@@ -31,7 +31,7 @@ class TestEammFrontendSurveyWebpage(unittest.TestCase):
         my_page3.query_string = "var1=12345&var2=rich@amazon.com&var3=sfsdfs"
         return_value = my_page3.parse_query_string() 
         self.assertTrue(return_value)
-    
+        
     # test with a bad query string, plausible badness.
     def test_parse_query_string4(self):
         my_page4 = eamm.frontend.survey_webpage.SurveyWebpage()
@@ -46,17 +46,19 @@ class TestEammFrontendSurveyWebpage(unittest.TestCase):
         return_value = my_page5.parse_query_string() 
         self.assertFalse(return_value)
     
-    
     # test that the survey page is working.
     def test_show_survey1(self):     
         username = 'test'
         password = 'test-pass'
-        url = 'http://127.0.0.1/eamm/private/complete_survey.py?var1=1&var2=test@test.com'
+        qs = '?var1=1&var2=test@test.com'
+        url = 'http://127.0.0.1/eamm/private/complete_survey.py%s' % qs
         
+        # setup everything needed to do basic auth
         passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
         passman.add_password(None, url, username, password)
         urllib2.install_opener(urllib2.build_opener(urllib2.HTTPBasicAuthHandler(passman)))
 
+        # call the web page, check to see if the title is as we expect
         req = urllib2.Request(url)
         f = urllib2.urlopen(req)
         data = f.read()

@@ -28,17 +28,17 @@ def main():
     html = """
     
     <table>
-          <tr>
-            <td class="col1" rowspan="%s">User Meeting Metrics</td>
-            <td class="col2_top" colspan="2">Scope: All Meetings</td>
-          </tr>
-          <tr>
-            <td class="sub_col_1a">Average Rating (all meetings, all questions)</td>
-            <td class="%s">%s</td>
-          </tr>
-          <tr>
-            <td class="col2_top" colspan="2">Scope: Individual Meetings</td>
-          </tr>
+      <tr>
+        <td class="col1" rowspan="%s">User Meeting Metrics</td>
+        <td class="col2_top" colspan="2"><b>Scope: All Meetings</b></td>
+      </tr>
+      <tr>
+        <td class="sub_col_1a">Average Rating (all meetings, all questions)</td>
+        <td class="%s">%s</td>
+      </tr>
+      <tr>
+        <td class="col2_top" colspan="2"><b>Scope: Individual Meetings</b></td>
+      </tr>
     """ % (rowspan, t_css, int(tot_avg_score[0][0]))
     
     for row in avg_score_per_meeting:
