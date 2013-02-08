@@ -21,11 +21,18 @@ def main():
     tot_avg_score         = eamm.backend.metrics.get_tot_avg_score(user)
     avg_score_per_meeting = eamm.backend.metrics.get_avg_score_per_meeting(user)
     
+    my_chart = eamm.backend.metrics.Chart()
+    chart1 = my_chart.user_scores(user) 
+    
+    img1 = """<img src="%s"/>""" % chart1
+    
     num_meetings = len(avg_score_per_meeting)
     rowspan = 3 + num_meetings
     
     t_css = eamm.backend.metrics.css(int(tot_avg_score[0][0]))
-    html = """
+    html = """ 
+    
+    %s
     
     <table>
       <tr>
@@ -39,7 +46,7 @@ def main():
       <tr>
         <td class="col2_top" colspan="2"><b>Scope: Individual Meetings</b></td>
       </tr>
-    """ % (rowspan, t_css, int(tot_avg_score[0][0]))
+    """ % (img1, rowspan, t_css, int(tot_avg_score[0][0]))
     
     for row in avg_score_per_meeting:
         score = int(row[2])
