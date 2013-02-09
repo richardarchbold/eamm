@@ -18,10 +18,12 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
     def __init__(self):
         super(MeetingInviteWebPage, self).__init__()
         self.tinymce_js = """
-        
-            <script type="text/javascript" src="/eamm/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
-            <script type="text/javascript">
-            
+
+<!-- START JS :: WYSIWYG TEXTAREA --> 
+
+<script type="text/javascript" src="/eamm/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
+
+<script type="text/javascript">
                 tinyMCE.init({
                     mode : "textareas",
                     theme : "advanced",
@@ -30,12 +32,12 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
                     theme_advanced_buttons3 : "",
                     theme_advanced_toolbar_location : "top",
                     theme_advanced_toolbar_align : "left",
-                    theme_advanced_statusbar_location : "bottom",
-            
+                    theme_advanced_statusbar_location : "bottom",            
                 });
                 
-            </script>
-            
+</script>
+
+<!-- END JS :: WYSIWYG TEXTAREA --> 
             """
     
     def add_meeting_invite_step_1(self):
@@ -195,6 +197,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
     def add_meeting_invite_step_3(self, form):
         self.set_title("Create a new meeting invite :: Step 3")
         self.js += self.tinymce_js
+        self.js += self.datepicker_js
         
         purpose = form.getvalue('purpose')
         justification = form.getvalue('justification')
@@ -206,7 +209,9 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         my_template.get(id_template)
         
         html = """
-        <form name="add_meeting_invite" id="add_meeting_invite" onsubmit="return validateStep3Form()" method="post" action="/eamm/private/add_meeting_invite.py"> 
+        <form name="add_meeting_invite" id="add_meeting_invite" 
+            onsubmit="return validateStep3Form()" method="post" 
+            action="/eamm/private/add_meeting_invite.py"> 
         <input type="hidden" name="step" value="step3" /> 
         """
         
@@ -240,7 +245,8 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
           <tr>
             <td rowspan="7" class="col1">Logistics</td>
             <td class="sub_col_1">Start Date</td>
-            <td class="sub_col_2" colspan="3"><input type="text" id="start_date" name="start_date" value="yyyy-mm-dd"/></td>
+            <td class="sub_col_2" colspan="3">
+                <input type="text" id="start_date" name="start_date"/></td>
           </tr>
         
           <tr>
@@ -430,7 +436,7 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
                                      your invitees</td>
                   </tr>
                   <tr>
-                    <td class="header"> Return to <a href="/eamm/index.html">Main Menu</a></td>
+                    <td class="header"> Return to <a href="/eamm/public/index.html">Main Menu</a></td>
                   </tr>
                 </table>
                 """

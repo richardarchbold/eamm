@@ -110,6 +110,12 @@ table {
 	padding: 0.1cm;
 }
 
+.txt_area2 {
+	background-color: #C3FDB8;
+	padding: 0.1cm;
+    text-align: center;
+}
+
 .sub_col_1 {
 	width: 130px;
 	background-color: #cfe7f5;

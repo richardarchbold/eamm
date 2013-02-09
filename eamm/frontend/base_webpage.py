@@ -10,8 +10,49 @@ class WebPage(object):
     def __init__(self):
         self.css = "/eamm/css/eamm.css"
         self.title = "EAMM ::"
-        self.js = '<script type="text/javascript"' \
-                + 'src="http://127.0.0.1/eamm/js/eamm.js"></script>'
+        self.js = """
+        
+<!-- START JS :: EAMM -->
+
+<script type="text/javascript" src="http://127.0.0.1/eamm/js/eamm.js"></script>
+
+<!-- END JS :: EAMM -->
+        """
+
+        self.datepicker_js = """
+        
+<!-- START JS :: JQUERY DATEPICKER -->
+
+<link rel="stylesheet" 
+    href="http://code.jquery.com/ui/1.10.0/themes/base/jquery-ui.css" />
+    
+<script src="http://code.jquery.com/jquery-1.8.3.js"></script>
+
+<script src="http://code.jquery.com/ui/1.10.0/jquery-ui.js"></script>
+
+<script type="text/javascript" src="/eamm/js/jquery.timepicker.js"></script>
+<link rel="stylesheet" type="text/css" href="/eamm/css/jquery.timepicker.css" />
+
+<script>
+    $(function() {
+        var pickerOpts = {
+            dateFormat: $.datepicker.ATOM
+        };
+        $("#start_date").datepicker(pickerOpts);
+        $("#end_date").datepicker(pickerOpts);
+        
+        $('#start_time').timepicker({ 'timeFormat': 'H:i' });
+    });
+    
+    $(function() {
+        $('#start_time').timepicker({ 'timeFormat': 'H:i' });
+    
+    });
+    
+</script>
+
+<!-- END JS :: JQUERY DATEPICKER -->
+        """
         self.body = ""
         
     def set_title(self, title):
@@ -33,7 +74,13 @@ class WebPage(object):
     def simple_table(self, message):
         html = """
         <table>
-          <tr><td class="txt_area">%s</td></tr>
+          <tr>
+            <td class="txt_area2">%s</td>
+          </tr>
+          <tr>
+            <td class="txt_area2"><a href="/eamm/public/index.html">Home</a>
+            </td>
+          </tr>
         </table>
         """ % message
         return html
