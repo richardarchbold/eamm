@@ -50,6 +50,9 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
         
         rowspan = len(user_meetings) + 1
         
+        # add datepicker JS
+        self.js += self.datepicker_js
+        
         self.set_title("View Meetings for %s" % self.user)
     
         html = """
@@ -58,7 +61,8 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
         <table>
 
           <TR>
-            <TD colspan="4" class="aqua">Advanced Search</TD>
+            <TD colspan="4" class="aqua">Advanced Search<br>Search for meetings
+              in which you are the requester or an invitee</TD>
           </TR>
 
           <TR>
@@ -76,7 +80,7 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
             </TD>
             
             <TD class="col2_top">Title Text:<br>
-              <input type="text" id="text_search" name="text_search"/>
+              <input type="text" id="text_search" name="text_search" size="60"/>
             </TD>
             
           </TR>
@@ -209,7 +213,6 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
         self.template_title = this_template.title
         self.purpose        = this_invite.purpose
         self.agenda         = this_invite.agenda
-        self.button         = "OK"
          
         html = self.display_meeting_invite_table()
         
@@ -239,13 +242,13 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
         """ 
         sql_vars = [self.user, self.user]
         
-        if self.form.getvalue('start_date'):
+        if self.form.getvalue('start_date') != 'yyyy-mm-dd':
             sql += """
                and m.start_time > %s
             """
             sql_vars.append(self.form.getvalue('start_date'))
            
-        if self.form.getvalue('end_date'):
+        if self.form.getvalue('end_date') != 'yyyy-mm-dd':
             sql += """
                and m.end_time > %s
             """

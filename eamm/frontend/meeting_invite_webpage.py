@@ -198,6 +198,8 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
         self.set_title("Create a new meeting invite :: Step 3")
         self.js += self.tinymce_js
         self.js += self.datepicker_js
+        if not self.remote_user:
+            self.remote_user = "you@example.com"
         
         purpose = form.getvalue('purpose')
         justification = form.getvalue('justification')
@@ -281,14 +283,17 @@ class MeetingInviteWebPage(eamm.frontend.base_webpage.WebPage):
                     
           <tr>
             <td class="sub_col_1">Requester</td>
-            <td class="sub_col_2" colspan="3"><input type="text" id="requester" name="requester" value="you@example.com" size="50"/></td>
+            <td class="sub_col_2" colspan="3">
+              <input type="text" id="requester" name="requester" value="%s" 
+               size="50"/>
+            </td>
           </tr>
                         
           <tr>
             <td class="sub_col_1">Invitees</td>
             <td class="sub_col_2" colspan="3"><textarea class="txt_area" cols="80" rows="10" name="invitees">each invitee email address should be on a new line</textarea></td>
           </tr>
-        """
+        """ % self.remote_user
     
         html += """
           <tr>

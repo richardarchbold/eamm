@@ -1,6 +1,7 @@
+# Import modules for CGI handling , the cgitb modules gives descriptive debug errors to the browser.
+import cgitb; cgitb.enable(display=1)
+import os
 import logging
-
-
 
 # setup basic logging config
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
@@ -54,6 +55,15 @@ class WebPage(object):
 <!-- END JS :: JQUERY DATEPICKER -->
         """
         self.body = ""
+        self.home_button = """
+<form>
+  <input class="button" type="button" id="register" value="Home"
+    onClick="window.location.href='http://127.0.0.1/eamm/public/index.html'">
+</form>
+        """
+        
+        if os.environ['REMOTE_USER']:
+            self.remote_user = os.environ['REMOTE_USER']
         
     def set_title(self, title):
         self.title = self.title + ' ' + title
@@ -201,13 +211,13 @@ class WebPage(object):
           </tr>
           
           <tr>
-            <td class="header" colspan="3"><input type="submit" value="%s"/>
+            <td class="header" colspan="3">%s
             </td>
           </tr>
         </table>
         """ % (self.requester, invitees_list, self.title, self.start_date, 
                self.start_time, self.duration, self.recurring, self.end_date, 
                self.venue, self.template_title, self.purpose, self.agenda,
-               self.button)
+               self.home_button)
         
         return html

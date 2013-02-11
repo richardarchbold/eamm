@@ -1,4 +1,5 @@
 # import various std libs
+import cgitb; cgitb.enable(display=1)
 from datetime import datetime
 import md5
 import time
@@ -13,6 +14,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
+
 
 
 # setup basic logging config
@@ -85,7 +87,7 @@ class Chart(object):
         # 0. Only (re)create file if it doesn't exist or is
         #    older than 2 mins.
         if self.is_fresh(self.filename):
-            return self.filename
+            return self.imgname
         
         ###################################################
         # 1. get the data we want to plot
@@ -196,10 +198,9 @@ class Chart(object):
         
         two_minutes_ago = time.time() - 120
         mtime=stat.st_mtime
-        print "%s < %s" % (mtime, two_minutes_ago)
+        logging.info("%s < %s" % (mtime, two_minutes_ago))
         if mtime < two_minutes_ago:
             logging.info("%s is fresh enough, no need to regenerate" % fname)
-            print("%s is fresh enough, no need to regenerate" % fname)
             return True
         else:
             return False
