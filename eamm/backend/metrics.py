@@ -15,8 +15,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-
-
 # setup basic logging config
 import logging
 logging.basicConfig(filename="/var/log/eamm.log",level=logging.INFO)
@@ -109,6 +107,9 @@ class Chart(object):
         sql_vars = [user]
         rows = db_conn.select2(sql, sql_vars)
         
+        if len(rows) == 0:
+            return False
+        
         ###################################################
         # 2. put the data in arrays
         g_dates = list()
@@ -150,7 +151,7 @@ class Chart(object):
     
         plt.setp(line2, color='r', linewidth=2.0,
                  label='Meeting Score SLA line', )
-        ax.legend()
+        ax.legend(loc='lower left')
     
         ###################################################
         # 6. format the X-axis
@@ -166,7 +167,9 @@ class Chart(object):
         ###################################################
         # 7. render the plot
         title_text = "Meeting Survey Scores for %s" % user
-        plt.title(title_text, color='green')
+        plt.title(title_text, 
+                  color='green', 
+                  )
         plt.savefig(self.filename)
         
         return self.imgname
@@ -198,8 +201,8 @@ class Chart(object):
         
         two_minutes_ago = time.time() - 120
         mtime=stat.st_mtime
-        logging.info("%s < %s" % (mtime, two_minutes_ago))
-        if mtime < two_minutes_ago:
+        logging.info("%s > %s" % (mtime, two_minutes_ago))
+        if mtime > two_minutes_ago:
             logging.info("%s is fresh enough, no need to regenerate" % fname)
             return True
         else:

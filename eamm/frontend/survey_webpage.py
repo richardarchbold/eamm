@@ -124,8 +124,13 @@ class SurveyWebpage(eamm.frontend.base_webpage.WebPage):
         where m.meeting_status='SCHEDULED' 
           and m.end_time<=date_add(now(), interval -15 minute)
           and v.invitee_email_addr=%s
+          and m.idMeeting not in (
+            select idMeeting 
+            from EAMM.Survey
+            where responder_email_addr=%s
+           )
         """
-        sql_vars = [user]
+        sql_vars = [user, self.remote_user]
         db_conn = eamm.backend.database.MyDatabase()
         rows = db_conn.select2(sql, sql_vars)
             
@@ -253,39 +258,42 @@ class SurveyWebpage(eamm.frontend.base_webpage.WebPage):
         
         html = """
         
-          <form action="/eamm/private/complete_survey.py" id="survey" method="post">
-          <input type="hidden" name="id_invite" value="%s" />
-          <input type="hidden" name="id_meeting" value="%s" />
-          <input type="hidden" name="email_addr" value="%s" />
-          <table>
+        <form action="/eamm/private/complete_survey.py" id="survey" method="post">
+        <input type="hidden" name="id_invite" value="%s" />
+        <input type="hidden" name="id_meeting" value="%s" />
+        <input type="hidden" name="email_addr" value="%s" />
+        <input type="hidden" name="responder_email_addr" value="%s" />
+        <table>
           
-            <TR>
-              <TD rowspan="6" class="col1">For which meeting?</TD>
-              <TD class="sub_col_1">Date & Time</TD>
-              <TD>%s</TD>
-            </TR>
+          <TR>
+            <TD rowspan="6" class="col1">For which meeting?</TD>
+            <TD class="sub_col_1">Date & Time</TD>
+            <TD>%s</TD>
+          </TR>
             
-            <TR>
-              <TD class="sub_col_1">Subject</TD>
-              <TD>%s</TD>
-            </TR>
+          <TR>
+            <TD class="sub_col_1">Subject</TD>
+            <TD>%s</TD>
+          </TR>
             
-            <TR>
-              <TD class="sub_col_1">Purpose</TD>
-              <TD>%s</TD>
-            </TR>
+          <TR>
+            <TD class="sub_col_1">Purpose</TD>
+            <TD>%s</TD>
+          </TR>
 
-            <TR>
-              <td class="sub_col_1">Justification</td>
-              <td>%s</td>
-            </TR>
+          <TR>
+            <td class="sub_col_1">Justification</td>
+            <td>%s</td>
+          </TR>
 
-            <TR>
-              <td class="sub_col_1">Agenda</td>
-              <td>%s</td>
-            </TR>
-        """ % (self.invite_obj.id_invite, self.meeting_obj.id_meeting, self.email_addr, 
-               self.meeting_obj.start_datetime, self.invite_obj.title, self.invite_obj.purpose, 
+          <TR>
+            <td class="sub_col_1">Agenda</td>
+            <td>%s</td>
+          </TR>
+        """ % (self.invite_obj.id_invite, self.meeting_obj.id_meeting, 
+               self.email_addr, self.remote_user, 
+               self.meeting_obj.start_datetime, 
+               self.invite_obj.title, self.invite_obj.purpose, 
                self.invite_obj.justification, self.invite_obj.agenda)
         
         html += """
@@ -302,24 +310,6 @@ class SurveyWebpage(eamm.frontend.base_webpage.WebPage):
             </TR>
         """
     
-        html += """
-        <!-- beginning HTML block for a single question -->
-            <TR>
-              <TD rowspan="2" class="col1">Question 1</td>
-              <td colspan="2" class="col2_top">If your email address is different from the one 
-              listed in the invitees box above, please enter it below. THis is used for de-duplication
-              purposes and all survey data is anonymized before being displayed</td>
-            </tr>
-            
-            <tr>
-              <td colspan="2" class="col2_bottom">
-              <div align="center">
-              <input type="text" name="responder_email_addr" value="" size="55"/>
-              </div>
-              </td>
-            </tr>
-            <!-- ending HTML block for a single question -->
-            """
         count = 0
         for row in self.survey_questions:
             # tmpArray[i] = tmpArray[i].replace(/<.*>/g,"");
@@ -341,7 +331,7 @@ class SurveyWebpage(eamm.frontend.base_webpage.WebPage):
               </td>
             </tr>
             <!-- ending HTML block for a single question -->
-            """ % (count+2, temp, row[0], row[0], row[0], row[0], row[0])
+            """ % (count+1, temp, row[0], row[0], row[0], row[0], row[0])
             
             count += 1
             html += html_question

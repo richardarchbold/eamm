@@ -39,7 +39,7 @@ class Meeting(object):
             if not my_query_results:
                 self.is_valid = False
                 self.error = my_db_conn.error
-                logging.info("aaa")
+                logging.info("No query results")
             elif len(my_query_results) == 0:
                 self.is_valid = False
                 self.error = "id_meeting %s does not exist"
@@ -52,6 +52,9 @@ class Meeting(object):
                 self.end_datetime = my_query_results[0][4]
                 self.meeting_chair = my_query_results[0][5]
                 self.meeting_minutes_notes = my_query_results[0][6]
+        else:
+            logging.info("bad id_meeting passed to init %s:%s" \
+                         % (type(id_meeting), id_meeting))
         
     
     def add(self, id_invite, start_datetime, end_datetime, meeting_chair):
@@ -60,11 +63,14 @@ class Meeting(object):
         self.end_datetime = end_datetime
         self.meeting_chair = meeting_chair
         
-        # idMeeting idInvite meeting_status start_time end_time meeting_chair meeting_minute_notes
+        # idMeeting idInvite meeting_status start_time end_time meeting_chair 
+        # meeting_minute_notes
         sql = """
-        INSERT INTO Meeting (idInvite, meeting_status, start_time, end_time, meeting_chair) VALUES 
+        INSERT INTO Meeting (idInvite, meeting_status, start_time, end_time, 
+                             meeting_chair) VALUES 
         ('%s', 'SCHEDULED', '%s', '%s', '%s')
-        """ % (self.id_invite, self.start_datetime, self.end_datetime, self.meeting_chair)
+        """ % (self.id_invite, self.start_datetime, self.end_datetime, 
+               self.meeting_chair)
         
         # Specify that this is an insert with an auto-incrementing PK.
         auto_increment = True       
@@ -77,8 +83,8 @@ class Meeting(object):
             my_db_connection = eamm.backend.database.MyDatabase()
             logging.info("noo")
         
-        # execute the insert, if it worked, the returned value will be the auto-incremented pk value
-        # for the fresh insert.
+        # execute the insert, if it worked, the returned value will be the 
+        # auto-incremented pk value for the fresh insert.
         logging.info("Adding Meeting with id_invite of \"%s\" to the Meeting tbl DB" % self.id_invite)
         my_last_insert_id = my_db_connection.insert(sql, auto_increment)
 

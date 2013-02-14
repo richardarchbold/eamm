@@ -29,48 +29,57 @@ def main():
     img1 = """<img src="%s"/>""" % chart1
     
     num_meetings = len(avg_score_per_meeting)
-    rowspan = 4 + num_meetings
     
-    t_css = eamm.backend.metrics.css(int(tot_avg_score[0][0]))
-    html = """ 
+    if (num_meetings == 0):
+        msg  = "No metrics exist for %s as no surveys have" % user
+        msg += "been submitted for this user yet"
+        tbl = this_webpage.error_table(msg)
+        this_webpage.add_to_body(tbl)
+    else:
+        rowspan = 4 + num_meetings
+        t_css = eamm.backend.metrics.css(int(tot_avg_score[0][0]))
+        html = """ 
     
-    %s
+        %s
     
-    <table>
-      <tr>
-        <td class="col1" rowspan="%s">User Meeting Metrics</td>
-        <td class="col2_top" colspan="3"><b>Scope: All Meetings</b></td>
-      </tr>
-      <tr>
-        <td class="sub_col_1a" colspan="2">Average Rating (all meetings, all questions)</td>
-        <td class="%s">%s</td>
-      </tr>
-      <tr>
-        <td class="col2_top" colspan="3"><b>Scope: Individual Meetings</b></td>
-      </tr>
-      <tr>
-        <td class="col2_top"><b><i>Date</i></b></td>
-        <td class="col2_top"><b><i>Title</i></b></td>
-        <td class="col2_top""><b><i>Score</i></b></td>
-    """ % (img1, rowspan, t_css, int(tot_avg_score[0][0]))
+        <table>
+         <tr>
+            <td class="col1" rowspan="%s">User Meeting Metrics</td>
+            <td class="col2_top" colspan="3"><b>Scope: All Meetings</b></td>
+          </tr>
+          <tr>
+           <td class="sub_col_1a" colspan="2">
+           Average Rating (all meetings, all questions)</td>
+            <td class="%s">%s</td>
+          </tr>
+          <tr>
+            <td class="col2_top" colspan="3">
+            <b>Scope: Individual Meetings</b></td>
+          </tr>
+         <tr>
+            <td class="col2_top"><b><i>Date</i></b></td>
+            <td class="col2_top"><b><i>Title</i></b></td>
+           <td class="col2_top""><b><i>Score</i></b></td>
+        """ % (img1, rowspan, t_css, int(tot_avg_score[0][0]))
     
-    for row in avg_score_per_meeting:
-        score = int(row[2])
-        css = eamm.backend.metrics.css(score)
+        for row in avg_score_per_meeting:
+            score = int(row[2])
+            css = eamm.backend.metrics.css(score)
             
-        # row is start_time, title, avg_rating
-        html += """
-        <tr>
-          <td class="sub_col_1a">%s</td>
-          <td class="sub_col_1a">%s</td>
-          <td class="%s">%s</td>
-        </tr>
-        """ % (row[0], row[1], css, score)
+            # row is start_time, title, avg_rating
+            html += """
+            <tr>
+              <td class="sub_col_1a">%s</td>
+              <td class="sub_col_1a">%s</td>
+              <td class="%s">%s</td>
+            </tr>
+            """ % (row[0], row[1], css, score)
     
-    html += """<tr><td class="header" colspan="4">%s
-    </td></tr>""" % this_webpage.home_button
-    html += "</table>"
-    this_webpage.add_to_body(html)
+        html += """<tr><td class="header" colspan="4">%s
+        </td></tr>""" % this_webpage.home_button
+        html += "</table>"
+        this_webpage.add_to_body(html)
+        
     this_webpage.render()
     
     

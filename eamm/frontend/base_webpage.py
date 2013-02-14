@@ -62,7 +62,7 @@ class WebPage(object):
 </form>
         """
         
-        if os.environ['REMOTE_USER']:
+        if 'REMOTE_USER' in os.environ:
             self.remote_user = os.environ['REMOTE_USER']
         
     def set_title(self, title):
