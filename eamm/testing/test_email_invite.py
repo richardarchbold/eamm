@@ -1,7 +1,11 @@
 #!/usr/bin/python
 
+import sys
+sys.path.append("/home/richard/workspace/eamm")
+
 import eamm.backend.meeting_invite
 import eamm.backend.meeting
+
 
 import smtplib
 from email.MIMEMultipart import MIMEMultipart

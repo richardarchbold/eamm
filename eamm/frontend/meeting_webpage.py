@@ -269,10 +269,11 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
             sql_vars.append(escaped_text_search)
         
         sql += """
+	group by m.idMeeting
         order by m.start_time
         """
         
-        logging.info("__search sql: %s" % sql) 
+        logging.info("meetingwebpage__search sql: %s" % sql) 
         db_conn = eamm.backend.database.MyDatabase()
         rows = db_conn.select2(sql, sql_vars)
             
@@ -299,6 +300,7 @@ class MeetingWebPage(eamm.frontend.base_webpage.WebPage):
             OR
             i.requester_email_addr=%s
           )
+        group by m.idMeeting
         order by m.start_time desc
         """
             

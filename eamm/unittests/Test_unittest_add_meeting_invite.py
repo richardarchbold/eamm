@@ -138,7 +138,7 @@ class Test(unittest.TestCase):
         # parse the response to make sure the meeting appears to have been
         # added.
         html = page.read()
-        #print html
+        print html
         match = re.search('Your meeting invite has been saved on the system', 
                           html)
         self.assertTrue(match)

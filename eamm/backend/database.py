@@ -91,6 +91,11 @@ class MyDatabase(object):
         return rows
     
     def select2(self, select_stmt, sql_vars=None):
+        """
+        This is a select method where the first arg passed to it is a string
+        with the sql statement to be executed. The second arg is an array 
+        containing elements to be substituted into the statement.
+        """
         logging.info("SELECT2:\nsql:%s" % select_stmt)
         
         cursor = self.db.cursor()
@@ -173,6 +178,11 @@ class MyDatabase(object):
             return my_id
     
     def insert2(self, insert_stmt, sql_vars, auto_increment=None):
+        """
+        This is an insert method where the first arg passed to it is a string
+        with the sql statement to be executed. The second arg is an array 
+        containing elements to be substituted into the statement.
+        """
         logging.info("INSERT2(autocommit=%s):\n%s" % (self.autocommit, 
                                                       insert_stmt))
         
