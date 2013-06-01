@@ -1,3 +1,38 @@
+// validating survey form submission
+function validateSurvey() {
+
+	var formValid = true
+	
+	// look for up to 9 questions, and validate each one.
+	for (var i=1; i<8; i++) {
+		
+		// create an array to put all of the radio check box options into.
+		var radios = document.getElementsByName(i);
+		
+		// assume none of the radio buttons are ticked for a question.
+		var radioValid = false;
+
+		// if any radio options are checked, the question is valid.
+    	for (var j=0; j<radios.length; j++) {
+        	if (radios[j].checked) {
+        		radioValid = true;
+        	}      
+    	}
+
+		// if none of the radio buttons for a question are valid, then
+		// the form is invalid
+    	if (radioValid == false) {
+    		formValid = false
+    	}
+	}
+	
+	// if the form is invalid, warn the user and return false.
+	if (formValid == false) {
+		alert("Please answer all questions!")
+		return false;
+	}
+}
+
 
 // The step3 form has:
 //  * start date

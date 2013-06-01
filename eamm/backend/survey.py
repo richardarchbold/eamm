@@ -56,7 +56,7 @@ class SurveyResponse(object):
             pass
         elif isinstance(arg1, (int, long)):
             # id_survey_response is an int, likely an existing id_survey_response
-            # 1. craft the SQL, be explict
+            # 1. craft the SQL, be explicit
             # 2. execute the query
             # 3. check the rows returned, should be more than 1.
             pass
@@ -73,10 +73,12 @@ class SurveyResponse(object):
             
             
     def __load_form(self, form):
-        if not all((form.getvalue('id_invite'), form.getvalue('id_meeting'),
-                    form.getvalue('email_addr'), form.getvalue('responder_email_addr'))):
-            self.error = "Class:SurveyResponse, Method: __load_form, Error: Not all form \
-            fields contain data"
+        if not all((form.getvalue('id_invite'), 
+                    form.getvalue('id_meeting'),
+                    form.getvalue('email_addr'), 
+                    form.getvalue('responder_email_addr'))):
+            self.error = "Class:SurveyResponse, Method: __load_form, Error: \
+            Not all form fields contain data"
             logging.info(self.error)
             raise Exception(self.error)
         else:
@@ -87,19 +89,19 @@ class SurveyResponse(object):
             
             self.q_and_a = dict()
             for i in form.keys():
-                logging.info("iiii: %s" % type(i))
+                logging.info("survey key type: %s" % type(i))
                 try:
-                    logging.info("@im trying")
                     j = int(i)
                     k = int(form.getvalue(i))
-                    logging.info("iiii is now %s %s" % (type(i), i))
+                    logging.info("survey key type is now %s %s" % (type(i), i))
                     if (isinstance(j, (int,long)) and 
                         isinstance(k, (int,long))):
                         # looks like we have a q&a pair.
                         self.q_and_a[j]=k
-                        logging.info("j=%s, form.getvalue(i)=%s" %(j, form.getvalue(i)))                       
+                        logging.info("j=%s, form.getvalue(i)=%s" \
+                                     %(j, form.getvalue(i)))                       
                 except:
-                    logging.info("booh %s, %s" % (type(i), i))
+                    logging.info("survey form error %s, %s" % (type(i), i))
                     pass
     
         
