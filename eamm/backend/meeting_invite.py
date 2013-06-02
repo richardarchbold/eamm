@@ -420,8 +420,8 @@ class MeetingInvite(object):
             else:
                 logging.info("Invite for %s DOES already exist in DB" 
                              % self.title)
-                self.error = "Invite for meeting with Title \"%s\" DOES " \
-                           + "already exist in DB" % self.title
+                self.error = "An identical meeting for \"%s\" " % self.title \
+                           + "is already scheduled!"
                 self.is_valid = False
                 return True
 
