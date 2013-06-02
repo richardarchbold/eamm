@@ -72,8 +72,11 @@ class WebPage(object):
             <div align="center">
             <table>
             <tr>
-              <td class="header"><img src="/eamm/images/dilbert-meeting.jpg" 
-                                  width="187" height="176"/></td>
+              <td class="header">
+                 <a href="/eamm/public/index.html">
+                 <img src="/eamm/images/dilbert-meeting.jpg" width="187" height="176"/>
+                 </a>
+              </td>
               <td class="header">Efficient Automated Meeting Manager :: %s</td>
             </tr>
             </table>
@@ -100,7 +103,10 @@ class WebPage(object):
         <table>
           <tr><td class="error">%s</td></tr>
         </table>
-        """ % message
+        
+        <br><br>
+        %s
+        """ % (message, self.home_button)
         return html
 
     def add_to_body(self, body):

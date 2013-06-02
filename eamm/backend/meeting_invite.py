@@ -1,3 +1,10 @@
+"""This module is the meeting invite backend abstraction layer
+
+This module contains the MeetingInvite Class, the backend class which models
+meeting invite behavior and performs storage actions for meeting invites.
+
+"""
+
 import logging
 import eamm.backend.database
 import eamm.backend.meeting

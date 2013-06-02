@@ -1,3 +1,13 @@
+"""This module is abstraction layer for sending out meeting invites.
+
+The email invites are currently multi-part messages that include vCalendar 
+invites.
+
+The actual mail sending is done using a gmail account, but this could be 
+switched to something else in the future.
+
+"""
+
 import eamm.backend.meeting_invite
 import eamm.backend.meeting
 import eamm.backend.metrics
@@ -16,7 +26,10 @@ import logging
 # setup basic logging config
 logging.basicConfig(filename='/var/log/eamm.log',level=logging.INFO)
 
+
 class EmailInvite(object):
+    
+    """Class to create and send meeting invite emails.""" 
     def __init__(self, id_invite):
         # static variables
         CRLF      = "\r\n"
